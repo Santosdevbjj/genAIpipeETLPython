@@ -30,4 +30,21 @@ Prepare-se para uma jornada prática pelo mundo da Ciência de Dados!
  ---
 
  
- 
+
+
+
+
+
+ ---
+
+ <section id="contato" class="hero">
+    <h2 class="section-title">📬 Contato</h2>
+    <footer>
+      <a href="https://santosdevbjj.github.io/portfolio/" target="_blank">GitHub</a>
+      <a href="https://linkedin.com/in/santossergioluiz" target="_blank">LinkedIn</a>
+      <a href="mailto:santossergiorealbjj@outlook.com">Email</a>
+    </footer>
+  </section> 
+
+  ---
+  
