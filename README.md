@@ -73,3 +73,9 @@ Prepare-se para uma jornada prática pelo mundo da Ciência de Dados!
 
 ---
 
+[![Portfólio](https://img.shields.io/badge/Portfólio-DEGRADED?style=for-the-badge&logo=internet-explorer&logoColor=white&colorA=6EE7B7&colorB=3B82F6)](https://santosdevbjj.github.io/portfolio/)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-DEGRADED?style=for-the-badge&logo=linkedin&logoColor=white&colorA=3B82F6&colorB=9333EA)](https://linkedin.com/in/santossergioluiz) 
+
+---
+
+
