@@ -5,6 +5,8 @@
 
 **Bootcamp Santander 2025 - Ciência de Dados com Python**
 
+---
+
 
 **Detalhes do Bootcamp:**
 
