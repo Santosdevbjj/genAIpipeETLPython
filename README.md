@@ -6,7 +6,8 @@
 **Bootcamp Santander 2025 - Ciência de Dados com Python**
 
 
-**Detalhes do Bootcamp:*"
+**Detalhes do Bootcamp:**
+
 Atuar como Cientista de Dados, com foco em Python, análise de dados, machine learning, bancos de dados, ferramentas de produtividade (Excel + IA) e computação em nuvem com AWS.
 
 ---
