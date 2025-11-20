@@ -29,52 +29,7 @@ Prepare-se para uma jornada prática pelo mundo da Ciência de Dados!
 
  ---
 
- 
 
-
-
-
-
- ---
-
- <section id="contato" class="hero">
-    <h2 class="section-title">📬 Contato</h2>
-    <footer>
-      <a href="https://santosdevbjj.github.io/portfolio/" target="_blank">GitHub</a>
-      <a href="https://linkedin.com/in/santossergioluiz" target="_blank">LinkedIn</a>
-      <a href="mailto:santossergiorealbjj@outlook.com">Email</a>
-    </footer>
-  </section> 
-
-  ---
-
-[![Portfólio](https://img.shields.io/badge/🌐%20Portfólio-000?style=for-the-badge)](https://santosdevbjj.github.io/portfolio/)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/santossergioluiz)
-[![GitHub](https://img.shields.io/badge/GitHub-000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/santosdevbjj)
-  
-
-  ---
-
-  [![Portfólio](https://img.shields.io/badge/🌐_Portfólio-000?style=for-the-badge)](https://santosdevbjj.github.io/portfolio/)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Sérgio_Santos-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/santossergioluiz) 
-
-
----
-
-  [![Portfólio](https://img.shields.io/badge/★_Portfólio-111827?style=for-the-badge&logo=githubpages&logoColor=00eaff)](https://santosdevbjj.github.io/portfolio/)
-[![LinkedIn](https://img.shields.io/badge/★_LinkedIn-111827?style=for-the-badge&logo=linkedin&logoColor=00eaff)](https://linkedin.com/in/santossergioluiz) 
-
----
-
-
-  [![Portfólio](https://img.shields.io/badge/Portfólio-1f2937?style=for-the-badge&logo=firefoxbrowser&logoColor=white)](https://santosdevbjj.github.io/portfolio/)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-1f2937?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/santossergioluiz) 
-
-
----
-
-[![Portfólio](https://img.shields.io/badge/Portfólio-DEGRADED?style=for-the-badge&logo=internet-explorer&logoColor=white&colorA=6EE7B7&colorB=3B82F6)](https://santosdevbjj.github.io/portfolio/)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-DEGRADED?style=for-the-badge&logo=linkedin&logoColor=white&colorA=3B82F6&colorB=9333EA)](https://linkedin.com/in/santossergioluiz) 
 
 ---
 
