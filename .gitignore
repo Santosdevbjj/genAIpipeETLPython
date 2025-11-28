@@ -1,0 +1,19 @@
+# Java
+api/build/
+api/.gradle/
+api/out/
+
+# Python
+etl/.venv/
+etl/__pycache__/
+etl/.pytest_cache/
+etl/etl.log
+
+# IDEs
+*.iml
+.idea/
+.vscode/
+
+# Docker
+pgdata/
+.env
