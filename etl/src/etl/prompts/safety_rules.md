@@ -1,0 +1,5 @@
+- Sem informações sensíveis do cliente.
+- Sem recomendações financeiras específicas ou garantias.
+- Evitar linguagem discriminatória ou viesada.
+- Tom profissional e respeitoso.
+- Sem links externos; foco no app Santander.
