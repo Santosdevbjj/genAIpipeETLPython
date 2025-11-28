@@ -1,0 +1,9 @@
+[project]
+name = "genai-etl"
+version = "0.1.0"
+description = "ETL com IA generativa para mensagens de marketing"
+requires-python = ">=3.14"
+authors = [{name="Santander GenAI ETL"}]
+
+[tool.pytest.ini_options]
+testpaths = ["etl/tests"]
