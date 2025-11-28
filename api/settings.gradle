@@ -1,0 +1,2 @@
+// api/settings.gradle
+rootProject.name = 'genai-etl-api'
