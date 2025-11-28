@@ -1,0 +1,11 @@
+# docker/postgres.Dockerfile
+FROM postgres:16
+
+ENV POSTGRES_DB=santander
+ENV POSTGRES_USER=postgres
+ENV POSTGRES_PASSWORD=postgres
+
+# Configura local de armazenamento
+VOLUME ["/var/lib/postgresql/data"]
+
+# Sem comandos extras; o Compose gerencia init scripts se necessário
