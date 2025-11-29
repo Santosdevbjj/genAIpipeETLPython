@@ -17,5 +17,5 @@ def run_pipeline(input_path: str, api_base: str, jwt_token: str, ai_provider: AI
         prompt = build_prompt(c)
         raw_text = ai_provider.generate(prompt)
         text = sanitize_output(raw_text)
-        result = post_message(api_base, c["id"], text, channel, jwt_token, modeloVersao="genai-v1")
+        result = post_message(api_base, c["id"], text, channel, jwt_token, modelo_versao="genai-v1")
         logger.info(f"Mensagem criada: {result.get('id')} para cliente {c['id']}")
