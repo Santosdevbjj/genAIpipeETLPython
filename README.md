@@ -25,7 +25,8 @@ Prepare-se para uma jornada prática pelo mundo da Ciência de Dados!
  
  Finalizaremos o processo enviando essas mensagens de volta para a API da 'Santander Dev Week 2023'. 
  
- Este passo ilustra como dados transformados são 
+ Este passo ilustra como dados transformados são reintegrados em sistemas, completando o ciclo de um pipeline ETL.
+
 
  
 ---
