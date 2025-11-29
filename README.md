@@ -52,13 +52,13 @@ Este README documenta o projeto completo de Data Science: microsserviço Java se
 
 **Tecnologias utilizadas**
 
-- Java 25 + Spring Boot 4: API REST segura, validação, JPA com repositórios e migrações Flyway.
-- OAuth2 + JWT: Autorização por escopos e autenticação stateless com tokens Bearer.
-- PostgreSQL: Transações ACID, integridade referencial, índices e consistência.
-- Python 3.12: Pipeline ETL, manipulação de dados, clientes HTTP e provider de IA plugável.
-- Boas práticas: SOLID, Design Patterns (Strategy, Factory, Repository), TDD/BDD/DDD.
-- Testes: JUnit/Mockito (unitários); Testcontainers (integração); Pytest/requests-mock (ETL).
-- DevOps: Docker, Compose, GitHub Actions CI; Sphinx e Markdown para documentação; Notebook em Google Colab.
+- **Java 25 + Spring Boot 4:** API REST segura, validação, JPA com repositórios e migrações Flyway.
+- **OAuth2 + JWT:** Autorização por escopos e autenticação stateless com tokens Bearer.
+- **PostgreSQL:** Transações ACID, integridade referencial, índices e consistência.
+- **Python 3.12:** Pipeline ETL, manipulação de dados, clientes HTTP e provider de IA plugável.
+- **Boas práticas:** SOLID, Design Patterns (Strategy, Factory, Repository), TDD/BDD/DDD.
+- **Testes:** JUnit/Mockito (unitários); Testcontainers (integração); Pytest/requests-mock (ETL).
+- **DevOps:** Docker, Compose, GitHub Actions CI; Sphinx e Markdown para documentação; Notebook em Google Colab.
 
 ---
 
