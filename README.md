@@ -66,99 +66,16 @@ Este README documenta o projeto completo de Data Science: microsserviço Java se
 
 **Esquema visual do repositório**
 
-`text
-📦 genAIpipeETLPython
-├─ 📄 README.md
-├─ 🧾 LICENSE
-├─ 🐳 docker/
-│  ├─ api.Dockerfile
-│  └─ postgres.Dockerfile
-├─ 🐘 docker-compose.yml
-├─ 🔑 .env.example
-├─ ☕ api/
-│  ├─ build.gradle
-│  ├─ settings.gradle
-│  └─ src/
-│     ├─ main/java/com/santander/genai/etl/
-│     │  ├─ GenAiEtlApplication.java
-│     │  ├─ config/
-│     │  │  ├─ SecurityConfig.java
-│     │  │  └─ OpenApiConfig.java
-│     │  ├─ domain/
-│     │  │  ├─ Cliente.java
-│     │  │  └─ MensagemMarketing.java
-│     │  ├─ repository/
-│     │  │  ├─ ClienteRepository.java
-│     │  │  └─ MensagemMarketingRepository.java
-│     │  ├─ service/
-│     │  │  ├─ ClienteService.java
-│     │  │  ├─ MensagemService.java
-│     │  │  └─ impl/
-│     │  │     ├─ ClienteServiceImpl.java
-│     │  │     └─ MensagemServiceImpl.java
-│     │  ├─ controller/
-│     │  │  ├─ ClienteController.java
-│     │  │  └─ MensagemController.java
-│     │  ├─ dto/
-│     │  │  ├─ ClienteDTO.java
-│     │  │  └─ MensagemDTO.java
-│     │  ├─ mapper/
-│     │  │  └─ DtoMapper.java
-│     │  └─ util/
-│     │     ├─ IdempotencyUtil.java
-│     │     └─ ValidationUtil.java
-│     ├─ main/resources/
-│     │  ├─ application.yml
-│     │  ├─ application-dev.yml
-│     │  └─ db/migration/V1init.sql
-│     └─ tests/
-│        ├─ java/com/santander/genai/etl/service/ClienteServiceTest.java
-│        ├─ java/com/santander/genai/etl/controller/ClienteControllerTest.java
-│        ├─ java/com/santander/genai/etl/repository/ClienteRepositoryTest.java
-│        └─ resources/application-test.yml
-├─ 🐍 etl/
-│  ├─ requirements.txt
-│  ├─ pyproject.toml
-│  └─ src/etl/
-│     ├─ init.py
-│     ├─ extract.py
-│     ├─ transform.py
-│     ├─ load.py
-│     ├─ prompts/
-│     │  ├─ base_prompt.txt
-│     │  └─ safety_rules.md
-│     ├─ clients/
-│     │  ├─ api_client.py
-│     │  └─ ai_provider.py
-│     ├─ models/
-│     │  ├─ customer.py
-│     │  └─ message.py
-│     ├─ utils/
-│     │  ├─ io.py
-│     │  ├─ validation.py
-│     │  └─ logging.py
-│     └─ pipeline.py
-│  ├─ src/app.py
-│  └─ tests/
-│     ├─ test_extract.py
-│     ├─ test_transform.py
-│     ├─ test_load.py
-│     └─ testpipelineintegration.py
-├─ 📓 notebooks/
-│  └─ SantanderDevWeek2025.ipynb
-├─ 📚 docs/
-│  ├─ conf.py
-│  ├─ index.rst
-│  ├─ data_dictionary.md
-│  ├─ model_card.md
-│  └─ architecture.md
-├─ 🧪 .github/workflows/
-│  ├─ ci-java.yml
-│  ├─ ci-python.yml
-│  └─ docs.yml
-├─ 🛠️ Makefile
-└─ 🗑️ .gitignore
-`
+<img width="884" height="1453" alt="Screenshot_20251129-033908" src="https://github.com/user-attachments/assets/2b47cb6d-d740-4312-99bb-324b0126057d" />
+<img width="912" height="1496" alt="Screenshot_20251129-034056" src="https://github.com/user-attachments/assets/e91aab89-9046-4e16-b520-62e498215fc2" />
+<img width="820" height="1448" alt="Screenshot_20251129-034256" src="https://github.com/user-attachments/assets/f355a9c0-96c1-4c24-b6f6-ba6ff6d598db" />
+
+
+
+
+
+---
+
 
 **Pastas e arquivos**
 
