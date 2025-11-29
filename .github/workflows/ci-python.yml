@@ -19,15 +19,28 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install deps
+      - name: Install deps and Project
         run: |
           cd etl
           python -m venv .venv
           . .venv/bin/activate
           pip install -r requirements.txt
           pip install pytest-httpx
+          # 💡 NOVO: Instala o código-fonte como um pacote editável (`-e`),
+          # que é a melhor prática para projetos com src/ para garantir que o 'etl' seja importável.
+          pip install -e . 
+
       - name: Run tests
         run: |
+          # Não precisamos mais do `cd etl` aqui, pois a instalação já configurou o path
+          # e o ambiente virtual foi ativado.
+          
+          # Entramos no diretório etl para ativar o ambiente.
           cd etl
           . .venv/bin/activate
-          pytest -q
+          
+          # 💡 NOVO: Executamos o pytest no diretório PAI (o diretório 'etl'),
+          # mas apontamos explicitamente para os testes em 'tests/'.
+          # O pytest consegue encontrar o pacote 'etl' porque ele foi instalado
+          # no passo anterior (`pip install -e .`).
+          pytest tests -q
