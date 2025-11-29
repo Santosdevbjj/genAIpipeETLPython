@@ -171,7 +171,7 @@ Este README documenta o projeto completo de Data Science: microsserviço Java se
   - **build.gradle:** Dependências, plugin Spring, toolchain Java 25, testes e empacotamento.
   - **settings.gradle:** Nome do projeto.
   - src/main/java/com/santander/genai/etl/
-    - GenAiEtlApplication.java: Classe principal para bootstrap do Spring.
+    - **GenAiEtlApplication.java:** Classe principal para bootstrap do Spring.
     - **config/**
       - **SecurityConfig.java:** Resource Server OAuth2/JWT, regras de autorização por escopo.
       - **OpenApiConfig.java:** Configuração do Swagger/OpenAPI com bearer auth.
