@@ -1,5 +1,5 @@
 ### Explorando IA Generativa em um Pipeline de ETL com Python
-
+ 
 ![santanderCiencia_Dados](https://github.com/user-attachments/assets/d683a333-0167-4d2c-9dec-62e1a246827e)
 
 
