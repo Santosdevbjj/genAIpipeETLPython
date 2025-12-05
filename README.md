@@ -295,7 +295,7 @@ Este README documenta o projeto completo de Data Science: microsserviço Java se
 
 ---
 
-**Autor:**
+**Autor:** 
   Sergio Santos 
 
 
