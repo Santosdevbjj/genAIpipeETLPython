@@ -6,59 +6,252 @@
 **Bootcamp Santander 2025 - Ciência de Dados com Python**
 
 --- 
- 
 
-**Detalhes do Bootcamp:**
+# Explorando IA Generativa em um Pipeline de ETL com Python
 
-Atuar como Cientista de Dados, com foco em Python, análise de dados, machine learning, bancos de dados, ferramentas de produtividade (Excel + IA) e computação em nuvem com AWS.
+![santanderCiencia_Dados](https://github.com/user-attachments/assets/d683a333-0167-4d2c-9dec-62e1a246827e)
 
----
-
-**DESCRIÇÃO:**
-
-Prepare-se para uma jornada prática pelo mundo da Ciência de Dados!
- Vamos construir um pipeline ETL (Extração, Transformação e Carregamento), demonstrando a relação entre dados, Inteligência Artificial (IA) e APIs. Extração: 
- 
- A aventura começa com uma planilha simples, de onde extrairemos os IDs dos usuários. Depois, usaremos esses IDs para acessar a API da 'Santander Dev Week 2023' e obter dados mais detalhados, um processo que evidencia a versatilidade na coleta de informações em Ciência de Dados. 
- 
- Transformação: Adentraremos o universo da IA com o GPT-4 da OpenAI, transformando esses dados em mensagens personalizadas de marketing. Veremos como a IA pode ser empregada de maneira inovadora e prática! Carregamento:  
- 
- Finalizaremos o processo enviando essas mensagens de volta para a API da 'Santander Dev Week 2023'. 
- 
- Este passo ilustra como dados transformados são reintegrados em sistemas, completando o ciclo de um pipeline ETL.
-
-
- 
----
-
-**Explorando IA generativa em um pipeline de ETL com Python**
-
-Este README documenta o projeto completo de Data Science: microsserviço Java seguro com OAuth2/JWT, banco PostgreSQL, pipeline ETL em Python gerando mensagens personalizadas via IA, testes robustos (unitários e integração), notebooks Colab, CI/CD e documentação técnica. Repositório: Santosdevbjj/genAIpipeETLPython.
+**Bootcamp Santander 2025 – Ciência de Dados com Python**  
+**Autor:** Sérgio Santos
 
 ---
 
-**Visão geral do projeto**
+## 📑 Sumário
 
-- **Objetivo:** Criar um pipeline ETL que transforma dados de clientes em mensagens de marketing personalizadas usando IA generativa, armazenando e servindo via API RESTful Java com segurança moderna.
-- **Stack principal:**
-  - **Backend:** Java 25 (LTS) + Spring Boot 4, Gradle, JPA, PostgreSQL, OAuth2 + JWT.
-  - **ETL e IA:** Python 3.12, Pandas, HTTPX, Pydantic, Prompt engineering, Pytest.
-  - **Infra e DevX:** Docker/Docker Compose, Makefile, GitHub Actions, Sphinx, Colab.
-- **Resultados:** CRUD de Clientes e Mensagens, ETL completo (Extract–Transform–Load), testes unitários e de integração, documentação profissional, workflows CI.
-
-> O repositório público do projeto está disponível no GitHub.
+- [Visão Geral](#visão-geral)  
+- [Objetivo do Projeto](#objetivo-do-projeto)  
+- [Arquitetura e Decisões Técnicas](#arquitetura-e-decisoes-tecnicas)  
+- [Tecnologias Utilizadas](#tecnologias-utilizadas)  
+- [Estrutura do Repositório](#estrutura-do-repositorio)  
+- [Requisitos do Sistema](#requisitos-do-sistema)  
+- [Como Executar](#como-executar)  
+- [Estratégia de Testes](#estrategia-de-testes)  
+- [Aprendizados e Desafios](#aprendizados-e-desafios)  
+- [Próximos Passos](#proximos-passos)  
+- [Contato](#contato)  
 
 ---
 
-**Tecnologias utilizadas**
+## 🌐 Visão Geral
 
-- **Java 25 + Spring Boot 4:** API REST segura, validação, JPA com repositórios e migrações Flyway.
-- **OAuth2 + JWT:** Autorização por escopos e autenticação stateless com tokens Bearer.
-- **PostgreSQL:** Transações ACID, integridade referencial, índices e consistência.
-- **Python 3.12:** Pipeline ETL, manipulação de dados, clientes HTTP e provider de IA plugável.
-- **Boas práticas:** SOLID, Design Patterns (Strategy, Factory, Repository), TDD/BDD/DDD.
-- **Testes:** JUnit/Mockito (unitários); Testcontainers (integração); Pytest/requests-mock (ETL).
-- **DevOps:** Docker, Compose, GitHub Actions CI; Sphinx e Markdown para documentação; Notebook em Google Colab.
+Este projeto apresenta um ecossistema completo de dados: um **microsserviço robusto em Java 25** integrado a um **pipeline de ETL em Python 3.12** que utiliza **IA Generativa (GPT-4)** para personalização de marketing.
+
+O sistema resolve o problema de **escala na comunicação com clientes**: extraímos dados brutos, utilizamos IA para gerar mensagens personalizadas e reinserimos esses dados em um ambiente seguro, auditável e versionado.  
+
+---
+
+## 🎯 Objetivo do Projeto
+
+- **Pipeline ETL Realista:** Demonstrar o ciclo Extract-Transform-Load entre diferentes tecnologias (Python ↔ Java).  
+- **Engenharia de Prompts:** Aplicar IA para transformar dados de crédito e score em mensagens de marketing empáticas e sanitizadas.  
+- **Segurança e Robustez:** Implementar padrões de mercado como OAuth2, JWT stateless e idempotência.  
+- **Cultura DevOps:** Garantir reprodutibilidade via Docker, Makefile e automação com CI/CD.  
+
+---
+
+## 🏗 Arquitetura e Decisões Técnicas
+
+A arquitetura separa claramente **processamento de dados** e **persistência/serviço**, seguindo boas práticas de engenharia de software.
+
+- **Python para ETL:** Escolhido pela agilidade no ecossistema de dados. Pandas para manipulação, Pydantic para validação e integração com GPT-4 via interface plugável.  
+- **Java para Backend:** Spring Boot 4 com Java 25 garante escalabilidade e segurança. API atua como "Single Source of Truth" para clientes e mensagens.  
+- **Segurança:** OAuth2 + JWT stateless permite que o ETL seja executado de forma distribuída ou agendada (ex.: CronJob).  
+- **Idempotência:** Fingerprint SHA-256 no carregamento de mensagens evita duplicidade causada por falhas de rede.  
+- **Trade-offs:** Optamos por balancear segurança, desempenho e simplicidade, mantendo o pipeline testável e modular.  
+
+---
+
+## 🛠 Tecnologias Utilizadas
+
+- **Linguagens:** Java 25 (LTS), Python 3.12  
+- **Frameworks e Bibliotecas:** Spring Boot 4, Spring Security, JPA/Hibernate, Pandas, Pydantic, Pytest, HTTPX  
+- **Banco de Dados:** PostgreSQL 16, Flyway (migrações)  
+- **Inteligência Artificial:** GPT-4 via provider plugável, engenharia de prompts  
+- **Testes:** JUnit 5, Mockito, Testcontainers (Java), Pytest + httpx-mock (Python)  
+- **Infraestrutura e DevOps:** Docker, Docker Compose, Makefile, GitHub Actions, Sphinx  
+- **Boas Práticas:** SOLID, Design Patterns (Repository, Strategy, Factory), TDD/BDD/DDD  
+
+---
+
+## 📂 Estrutura do Repositório
+
+```text
+genAIpipeETLPython/
+├── api/                        # Microsserviço Java
+│   ├── src/main/java/com/santander/genai/etl/
+│   │   ├── config/             # Configurações de segurança e Swagger/OpenAPI
+│   │   ├── controller/         # Endpoints REST (Clientes e Mensagens)
+│   │   ├── domain/             # Entidades: Cliente, MensagemMarketing
+│   │   ├── dto/                # DTOs de entrada/saída com validação
+│   │   ├── mapper/             # Conversões entre DTOs e entidades
+│   │   ├── repository/         # CRUD com JPA
+│   │   └── service/impl/       # Lógica de negócio, idempotência e validações
+│   └── src/main/resources/     # application.yml, migrações Flyway
+│   └── src/test/java/...       # Testes unitários e integração
+├── etl/                        # Pipeline Python
+│   ├── src/etl/
+│   │   ├── clients/            # Integração com API e provider de IA
+│   │   ├── prompts/            # Templates de prompts e regras de segurança
+│   │   ├── models/             # Schemas Pydantic (Cliente, Mensagem)
+│   │   ├── utils/              # Logging, IO, validação de dados
+│   │   ├── extract.py           # Leitura de planilhas e fetch de clientes
+│   │   ├── transform.py         # Construção de prompts e sanitização
+│   │   ├── load.py              # POST de mensagens via API
+│   │   └── pipeline.py          # Orquestra ETL completo
+│   └── tests/                  # Testes unitários e integração do ETL
+│   └── requirements.txt        # Dependências Python
+│   └── pyproject.toml          # Configuração do Pytest
+├── docker/                     # Dockerfiles e composição de containers
+├── notebooks/                  # Google Colab para demonstração
+├── docs/                       # Documentação Sphinx, dicionário de dados e Model Cards
+├── Makefile                    # Comandos de build, run, tests e docs
+└── .env.example                # Template de variáveis de ambiente
+
+```
+
+---
+
+💻 **Requisitos do Sistema**
+
+**Hardware mínimo:**
+• CPU: 4 cores
+• RAM: 8 GB (recomendado 16 GB)
+• Armazenamento: 10 GB livres em SSD
+
+
+**Software:**
+
+• Docker >= 24
+• Docker Compose >= 2
+•™Git >= 2.40
+• JDK 25
+• Python 3.12
+• Virtualenv para Python (python -m venv .venv)
+
+
+**Ambiente:**
+Variáveis de ambiente configuradas via .env (ex.: DB, JWT, API Base, IA provider)
+
+
+
+
+## Como Executar
+
+**1) Clonar o repositório**
+   
+
+```
+git clone https://github.com/Santosdevbjj/genAIpipeETLPython.git
+cd genAIpipeETLPython
+cp .env.example .env  # Edite com suas credenciais
+```
+
+
+
+**3) Subir infraestrutura (Docker)**
+   
+
+```
+make docker-up
+```
+
+
+
+**4) Rodar a API Java**
+   
+• **Local:**
+
+```
+cd api
+./gradlew clean build
+java -jar build/libs/genai-etl-api.jar
+Swagger UI: http://localhost:8080/swagger-ui
+```
+
+
+**4) Rodar o Pipeline ETL Python**
+   
+
+```
+cd etl
+python -m venv .venv
+# Linux/Mac
+source .venv/bin/activate
+# Windows
+.\.venv\Scripts\activate
+pip install -r requirements.txt
+
+python src/app.py \
+  --input data/clientes.xlsx \
+  --api-base http://localhost:8080/api \
+  --jwt "SEU_TOKEN" \
+  --channel app
+```
+
+  
+  
+**5) Rodar Notebook Colab**
+
+• Abrir notebooks/SantanderDevWeek2025.ipynb
+
+• Executar células para clonar repo, instalar dependências do ETL e rodar pipeline demonstrativo
+
+
+🧪 **Estratégia de Testes**
+
+• **Java:** Testes unitários com Mockito; integração com Testcontainers usando Postgres real
+
+• **Python:** Mocks de rede (httpx-mock) para validar ETL sem consumir tokens de IA ou depender da API online
+
+• **Arquivos importantes:**
+
+• etl/tests/test_extract.py
+
+• etl/tests/test_transform.py
+
+• etl/tests/test_load.py
+
+• etl/tests/test_pipeline_integration.py
+
+
+**Comandos:**
+
+
+```
+# Java
+./gradlew test
+# Python
+pytest -v etl/tests/
+```
+
+
+
+🧠 **Aprendizados e Desafios**
+
+• Lidar com natureza não-determinística da IA exigiu sanitização e limites rígidos de caracteres para manter consistência no banco.
+
+• Separar entidades de domínio e DTOs em Java facilitou manutenção e evolução do modelo de mensagens.
+
+• Implementar idempotência economizou recursos financeiros, evitando chamadas redundantes à API da OpenAI.
+
+• Criar testes integrados e mocks de rede aumentou a confiabilidade e reprodutibilidade do pipeline.
+
+
+📈 **Próximos Passos**
+
+• Integrar Micrometer para métricas expostas a Prometheus/Grafana
+
+• Adicionar Redis para cache de consultas frequentes
+
+• Criar dashboard em Streamlit para visualização dos resultados do ETL
+
+• Versionar prompts em Model Registry como artefatos de ML
+
+
+
+
+
+
 
 ---
 
@@ -66,7 +259,8 @@ Este README documenta o projeto completo de Data Science: microsserviço Java se
 
 **Esquema visual do repositório**
 
-<img width="884" height="1453" alt="Screenshot_20251129-033908" src="https://github.com/user-attachments/assets/2b47cb6d-d740-4312-99bb-324b0126057d" />
+<img width="884" height="1453" alt="Screenshot_20251129-033908" src="
+ " />
 <img width="912" height="1496" alt="Screenshot_20251129-034056" src="https://github.com/user-attachments/assets/e91aab89-9046-4e16-b520-62e498215fc2" />
 <img width="820" height="1448" alt="Screenshot_20251129-034256" src="https://github.com/user-attachments/assets/f355a9c0-96c1-4c24-b6f6-ba6ff6d598db" />
 
@@ -163,127 +357,15 @@ Este README documenta o projeto completo de Data Science: microsserviço Java se
 - **Makefile:** Atalhos para build/run da API, venv e execução do ETL, Compose, testes e docs.
 - **.gitignore:** Ignora artefatos de build, venv, caches e envs.
 
-> O conteúdo reflete as necessidades do projeto descritas no repositório e na proposta de ETL com IA generativa.
+
 
 ---
 
-**Requisitos de hardware e software**
 
-- **Hardware mínimo:**
-  - **CPU:** 4 cores.
-  - **Memória:** 8 GB (recomendado 16 GB para containers e notebooks).
-  - **Armazenamento:** 10 GB livres em SSD.
-- **Software:**
-  - **Java:** JDK 25 instalado e no PATH.
-  - **Python:** 3.12 com venv e pip.
-  - **Banco:** Docker com imagem Postgres 16; Docker Compose.
-  - **Ferramentas:** Git, Make, IDE (IntelliJ para Java, VSCode para Python), Sphinx.
-  - **Credenciais:** Variáveis para JWT (issuer, audience, chave pública), API Base, e provedor de IA (quando usar real).
 
----
 
-**Execução do projeto**
 
-**1) Clonar o repositório**
-- Comando:
-  - git clone https://github.com/Santosdevbjj/genAIpipeETLPython.git
-  - cd genAIpipeETLPython
 
-**2) Configurar ambiente**
-- Ajustar variáveis: Copie .env.example para .env e defina DB, JWT e API Base.
-- Subir containers:
-  - docker compose up -d --build
-- Verificar Postgres: Healthcheck deve ficar saudável.
-
-**3) API Java (local ou via Docker)**
-- Build local: cd api && ./gradlew clean build
-- Executar local (sem Docker): java -jar api/build/libs/genai-etl-api.jar
-- Swagger/OpenAPI: http://localhost:8080/swagger-ui
-
-**4) ETL Python**
-- Instalação: cd etl && python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
-- Execução:
-  - python src/app.py --input data/clientes.xlsx --api-base http://localhost:8080/api --jwt "<seu_token>" --channel app
-- Resultado: Mensagens criadas e persistidas via API; logs em etl/etl.log.
-
-**5) Notebook Colab**
-- Abrir: notebooks/SantanderDevWeek2025.ipynb
-- Rodar células: Clona repo, instala deps do ETL e executa pipeline demonstrativo.
-
----
-
-**Testes feitos**
-
-**Java (JUnit + Mockito + Testcontainers)**
-- **Unitários:**
-  - **ClienteServiceTest:** Criação de cliente com mock de ClienteRepository (Mock Object Pattern com Mockito). Valida persistência e mapeamento DTO→Entidade→DTO.
-  - **MensagemServiceTest (implícito):** Idempotência de mensagens por fingerprint SHA-256, validações de campos obrigatórios e canal.
-  - **Controller Tests:** ClienteControllerTest usa MockMvc para validar retorno HTTP em criação sem token (exemplo de segurança).
-- **Integração (proposta):**
-  - Repository + DB: Testcontainers para subir Postgres real e validar migrações Flyway e CRUD; @SpringBootTest + @AutoConfigureMockMvc para cobrir fluxo Controller→Service→Repository com perfis de teste.
-- **Cobertura esperada:** Regras de negócio, validações e mapeamentos com foco em confiabilidade do CRUD e segurança.
-
-**Python (Pytest + requests-mock/httpx-mock)**
-- **Unitários:**
-  - **test_extract.py:** Confere leitura de IDs de CSV/Excel, garantindo tipos e integridade.
-  - **test_transform.py:** Verifica se o prompt contém campos essenciais (nome, segmento) e que sanitização respeita limite de 600 caracteres.
-  - **test_load.py:** Exercita POST com sucesso (201) e trata erro (400) levantando HTTPStatusError.
-- **Integração:**
-  - **testpipelineintegration.py:** Roda pipeline com mocks de fetchcustomersfromapi e postmessage, garantindo orquestração E→T→L, sem depender de rede real.
-- **Boas práticas:**
-  - **Fixtures e monkeypatch:** Isolam dependências externas e aumentam reprodutibilidade.
-  - **Logs:** Verificação manual em etl.log para rastreabilidade.
-
----
-
-**Documentação de Data Science**
-
-**Documento de escopo**
-- **Objetivos de negócio:** Personalização escalável de mensagens para aumentar engajamento, CTR e conversão em produtos segmentados.
-- **KPIs:** Abertura, CTR, conversão, opt-in, satisfação, taxa de aprovação em revisão.
-- **Restrições:** Compliance legal, linguagem responsável, proteção de dados, sem informações sensíveis.
-
-**Dicionário de dados**
-- **Cliente:** id (PK), nome, email, segmento (Varejo/Select/Private), limite_credito (>=0), score (0–1000).
-- **MensagemMarketing:** id (PK), clienteid (FK), texto (<=1000), canal (email/sms/app), modeloversao, created_at.
-- Documentado em docs/data_dictionary.md.
-
-**Model Card (componente generativo)**
-- **Uso pretendido:** Geração de mensagens curtas de marketing com dados não sensíveis.
-- **Entradas:** nome, segmento, limite, score; sem PII sensível além de nome e email para envios.
-- **Saídas:** Texto sanitizado, tom profissional/empático, limite de caracteres.
-- **Avaliação:** Leitura humana, legibilidade, detecção de toxidade; auditoria de versão.
-- **Documentado em docs/model_card.md.**
-
-**Arquitetura e governança**
-- **API Java:** Camadas Controller→Service→Repository; segurança OAuth2/JWT; JPA/Flyway.
-- **ETL Python:** Extract (planilha/CSV/API), Transform (prompt + provider IA), Load (POST API).
-- **Observabilidade:** Logs estruturados, healthchecks; extensão futura para Prometheus/Grafana.
-- **Reprodutibilidade:** Seeds, Run IDs, hash de prompt, versioneamento em CI e documentação Sphinx.
-
-**Sphinx docs**
-- **Conteúdo:** Índice, dicionário de dados, model card e arquitetura.
-- **Build:** make docs ou workflow docs.yml.
-
----
-
-**Padrões de projeto e qualidade**
-
-- **SOLID:** Serviços coesos (Single Responsibility), interfaces para abstrações (Dependency Inversion).
-- **Design Patterns:** Repository (JPA), Strategy/Factory (canais de mensagem — espaço para evoluir), DTO Mapper.
-- **TDD/BDD/DDD:** Foco em comportamento e domínio (Cliente, MensagemMarketing), testes guiando implementação e design.
-- **Mockito:** Mock Object Pattern para isolar dependências nos testes unitários Java.
-- **Idempotência:** Evita duplicação de mensagens por fingerprint do payload (Cliente + Canal + Texto).
-
----
-
-**Como contribuir e boas práticas**
-
-- **Branching:** feature/, fix/, docs/*; PRs com revisão.
-- **Commits:** Mensagens claras, escopo reduzido; inclua testes.
-- **Segredos:** Nunca versionar .env; usar GitHub Actions secrets e variáveis de ambiente.
-- **Code style:** Java (Google/IntelliJ defaults), Python (black/flake8 — recomendável adicionar).
-- **Issues:** Descrever bug/feature com passos de reprodução e contexto de negócio.
 
 ---
 
