@@ -5,14 +5,6 @@
 
 **Bootcamp Santander 2025 - Ciência de Dados com Python**
 
---- 
-
-# Explorando IA Generativa em um Pipeline de ETL com Python
-
-![santanderCiencia_Dados](https://github.com/user-attachments/assets/d683a333-0167-4d2c-9dec-62e1a246827e)
-
-**Bootcamp Santander 2025 – Ciência de Dados com Python**  
-**Autor:** Sérgio Santos
 
 ---
 
@@ -340,35 +332,6 @@ pytest -v etl/tests/
 • Criar dashboard em Streamlit para visualização dos resultados do ETL
 
 • Versionar prompts em Model Registry como artefatos de ML
-
-
-
-
-
-
-
----
-
-**Estrutura de diretórios e arquivos**
-
-**Esquema visual do repositório**
-
-<img width="884" height="1453" alt="Screenshot_20251129-033908" src="
- " />
-<img width="912" height="1496" alt="Screenshot_20251129-034056" src="https://github.com/user-attachments/assets/e91aab89-9046-4e16-b520-62e498215fc2" />
-<img width="820" height="1448" alt="Screenshot_20251129-034256" src="https://github.com/user-attachments/assets/f355a9c0-96c1-4c24-b6f6-ba6ff6d598db" />
-
-
-
-
- 
-
-
-
----
-
-
-
 
 
 
