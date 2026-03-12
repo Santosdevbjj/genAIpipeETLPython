@@ -1,0 +1,3288 @@
+
+
+
+Por favor, reescreva o readme.md do repositório do meu projeto no Github:
+
+https://github.com/Santosdevbjj/genAIpipeETLPython
+ 
+
+
+Seguindo as regras de Meigarom Lopes e Luiz Café.
+
+
+
+O readme.md está com esse conteúdo:
+
+
+### Explorando IA Generativa em um Pipeline de ETL com Python   
+ 
+![santanderCiencia_Dados](https://github.com/user-attachments/assets/d683a333-0167-4d2c-9dec-62e1a246827e)
+
+
+**Bootcamp Santander 2025 - Ciência de Dados com Python**
+
+
+---
+
+## 📑 Sumário
+
+- [Visão Geral](#visão-geral)  
+- [Objetivo do Projeto](#objetivo-do-projeto)  
+- [Arquitetura e Decisões Técnicas](#arquitetura-e-decisoes-tecnicas)  
+- [Tecnologias Utilizadas](#tecnologias-utilizadas)  
+- [Estrutura do Repositório](#estrutura-do-repositorio)  
+- [Requisitos do Sistema](#requisitos-do-sistema)  
+- [Como Executar](#como-executar)  
+- [Estratégia de Testes](#estrategia-de-testes)  
+- [Aprendizados e Desafios](#aprendizados-e-desafios)  
+- [Próximos Passos](#proximos-passos)  
+- [Contato](#contato)  
+
+---
+
+## 🌐 Visão Geral
+
+Este projeto apresenta um ecossistema completo de dados: um **microsserviço robusto em Java 25** integrado a um **pipeline de ETL em Python 3.12** que utiliza **IA Generativa (GPT-4)** para personalização de marketing.
+
+O sistema resolve o problema de **escala na comunicação com clientes**: extraímos dados brutos, utilizamos IA para gerar mensagens personalizadas e reinserimos esses dados em um ambiente seguro, auditável e versionado.  
+
+---
+
+## 🎯 Objetivo do Projeto
+
+- **Pipeline ETL Realista:** Demonstrar o ciclo Extract-Transform-Load entre diferentes tecnologias (Python ↔ Java).  
+- **Engenharia de Prompts:** Aplicar IA para transformar dados de crédito e score em mensagens de marketing empáticas e sanitizadas.  
+- **Segurança e Robustez:** Implementar padrões de mercado como OAuth2, JWT stateless e idempotência.  
+- **Cultura DevOps:** Garantir reprodutibilidade via Docker, Makefile e automação com CI/CD.  
+
+---
+
+## 🏗 Arquitetura e Decisões Técnicas
+
+A arquitetura separa claramente **processamento de dados** e **persistência/serviço**, seguindo boas práticas de engenharia de software.
+
+- **Python para ETL:** Escolhido pela agilidade no ecossistema de dados. Pandas para manipulação, Pydantic para validação e integração com GPT-4 via interface plugável.  
+- **Java para Backend:** Spring Boot 4 com Java 25 garante escalabilidade e segurança. API atua como "Single Source of Truth" para clientes e mensagens.  
+- **Segurança:** OAuth2 + JWT stateless permite que o ETL seja executado de forma distribuída ou agendada (ex.: CronJob).  
+- **Idempotência:** Fingerprint SHA-256 no carregamento de mensagens evita duplicidade causada por falhas de rede.  
+- **Trade-offs:** Optamos por balancear segurança, desempenho e simplicidade, mantendo o pipeline testável e modular.  
+
+---
+
+## 🛠 Tecnologias Utilizadas
+
+- **Linguagens:** Java 25 (LTS), Python 3.12  
+- **Frameworks e Bibliotecas:** Spring Boot 4, Spring Security, JPA/Hibernate, Pandas, Pydantic, Pytest, HTTPX  
+- **Banco de Dados:** PostgreSQL 16, Flyway (migrações)  
+- **Inteligência Artificial:** GPT-4 via provider plugável, engenharia de prompts  
+- **Testes:** JUnit 5, Mockito, Testcontainers (Java), Pytest + httpx-mock (Python)  
+- **Infraestrutura e DevOps:** Docker, Docker Compose, Makefile, GitHub Actions, Sphinx  
+- **Boas Práticas:** SOLID, Design Patterns (Repository, Strategy, Factory), TDD/BDD/DDD  
+
+---
+
+## 📂 Estrutura do Repositório
+
+```text
+genAIpipeETLPython/
+├── api/                        # Microsserviço Java
+│   ├── src/main/java/com/santander/genai/etl/
+│   │   ├── config/             # Configurações de segurança e Swagger/OpenAPI
+│   │   ├── controller/         # Endpoints REST (Clientes e Mensagens)
+│   │   ├── domain/             # Entidades: Cliente, MensagemMarketing
+│   │   ├── dto/                # DTOs de entrada/saída com validação
+│   │   ├── mapper/             # Conversões entre DTOs e entidades
+│   │   ├── repository/         # CRUD com JPA
+│   │   └── service/impl/       # Lógica de negócio, idempotência e validações
+│   └── src/main/resources/     # application.yml, migrações Flyway
+│   └── src/test/java/...       # Testes unitários e integração
+├── etl/                        # Pipeline Python
+│   ├── src/etl/
+│   │   ├── clients/            # Integração com API e provider de IA
+│   │   ├── prompts/            # Templates de prompts e regras de segurança
+│   │   ├── models/             # Schemas Pydantic (Cliente, Mensagem)
+│   │   ├── utils/              # Logging, IO, validação de dados
+│   │   ├── extract.py           # Leitura de planilhas e fetch de clientes
+│   │   ├── transform.py         # Construção de prompts e sanitização
+│   │   ├── load.py              # POST de mensagens via API
+│   │   └── pipeline.py          # Orquestra ETL completo
+│   └── tests/                  # Testes unitários e integração do ETL
+│   └── requirements.txt        # Dependências Python
+│   └── pyproject.toml          # Configuração do Pytest
+├── docker/                     # Dockerfiles e composição de containers
+├── notebooks/                  # Google Colab para demonstração
+├── docs/                       # Documentação Sphinx, dicionário de dados e Model Cards
+├── Makefile                    # Comandos de build, run, tests e docs
+└── .env.example                # Template de variáveis de ambiente
+
+```
+
+---
+
+
+**Descrição das Pastas e arquivos**
+
+- **docker/**
+  - **api.Dockerfile:** Imagem do microsserviço Java (JRE 25), expõe porta 8080 e healthcheck.
+  - **postgres.Dockerfile:** Imagem base do PostgreSQL 16 com variáveis de ambiente e volume para dados.
+- **docker-compose.yml:** Orquestra containers de postgres e api, injeta variáveis de ambiente, healthcheck e mapeia portas.
+- **.env.example:** Template de variáveis (DB, JWT, IA provider e base da API) para configurar ambientes.
+- **api/ (Java 25 + Spring Boot 4)**
+  - **build.gradle:** Dependências, plugin Spring, toolchain Java 25, testes e empacotamento.
+  - **settings.gradle:** Nome do projeto.
+  - src/main/java/com/santander/genai/etl/
+    - **GenAiEtlApplication.java:** Classe principal para bootstrap do Spring.
+    - **config/**
+      - **SecurityConfig.java:** Resource Server OAuth2/JWT, regras de autorização por escopo.
+      - **OpenApiConfig.java:** Configuração do Swagger/OpenAPI com bearer auth.
+    - **domain/**
+      - **Cliente.java:** Entidade de cliente com validações e campos principais.
+      - **MensagemMarketing.java:** Entidade de mensagem com referência ao cliente, canal, texto e metadata.
+    - **repository/**
+      - **ClienteRepository.java:** CRUD via JPA.
+      - **MensagemMarketingRepository.java:** CRUD e busca por clienteId.
+    - **service/**
+      - **ClienteService.java:** Interface do serviço de clientes (CRUD).
+      - **MensagemService.java:** Interface do serviço de mensagens.
+      - **impl/**
+        - **ClienteServiceImpl.java:** Implementação com validações e atualização.
+        - **MensagemServiceImpl.java:** Implementação com idempotência simples e criação de mensagens.
+    - **controller/**
+      - **ClienteController.java:** Endpoints REST para clientes com escopos api:read e api:write.
+      - **MensagemController.java:** Endpoints para criação e consulta de mensagens.
+    - **dto/**
+      - **ClienteDTO.java:** DTO de entrada/saída com Bean Validation.
+      - **MensagemDTO.java:** DTO de mensagens com validação.
+    - **mapper/**
+      - **DtoMapper.java:** Conversões entre entidades e DTOs.
+    - **util/**
+      - **IdempotencyUtil.java:** Fingerprint SHA-256 do payload para evitar duplicidade.
+      - **ValidationUtil.java:** Validações adicionais de DTOs (defensive programming).
+  - **src/main/resources/**
+    - **application.yml:** Configurações gerais do Spring, datasource via env, Flyway, JWT.
+    - **application-dev.yml:** Perfil de desenvolvimento com conexão local.
+    - **db/migration/V1init.sql:** Migrações Flyway (tabelas e índices).
+  - **src/tests/**
+    - **java/.../service/ClienteServiceTest.java:** Teste unitário do serviço com Mockito.
+    - **java/.../controller/ClienteControllerTest.java:** Teste de controller com MockMvc (exemplo sem segurança full).
+    - **java/.../repository/ClienteRepositoryTest.java:** Placeholder para testes com Testcontainers.
+    - **resources/application-test.yml:** Config de testes com H2 em modo Postgres.
+- **etl/ (Python 3.12)**
+  - **requirements.txt:** Dependências do ETL (pandas, httpx, pydantic, pytest, dotenv, loguru).
+  - **pyproject.toml:** Metadados e configuração do Pytest.
+  - **src/etl/**
+    - **init.py:** Inicialização do pacote.
+    - **extract.py:** Leitura de IDs de planilha/CSV e fetch dos clientes na API com JWT.
+    - **transform.py:** Construção de prompt e sanitização da saída gerada.
+    - **load.py:** POST das mensagens na API com canal e versão do modelo.
+    - **prompts/base_prompt.txt:** Prompt base para IA com tom e limites.
+    - **prompts/safety_rules.md:** Regras de segurança para textos de marketing.
+    - **clients/api_client.py:** Cliente HTTP para GET/POST na API.
+    - **clients/ai_provider.py:** Interface AIProvider e mock provider para desenvolvimento.
+    - **models/customer.py:** Modelo Pydantic para clientes.
+    - **models/message.py:** Modelo Pydantic para mensagens.
+    - **utils/io.py:** Utilidades de IO (leitura de arquivo, ensure_dir).
+    - **utils/validation.py:** Validações leves (canal).
+    - **utils/logging.py:** Logger com rotação de arquivo.
+    - **pipeline.py:** Orquestra E-T-L: extrai, gera texto com IA, sanitiza e carrega via API.
+  - **src/app.py:** CLI para executar o pipeline com parâmetros (input, api-base, jwt, canal).
+  - **tests/**
+    - **test_extract.py:** Testa leitura de IDs.
+    - **test_transform.py:** Verifica prompt e limite de caracteres.
+    - **test_load.py:** Verifica POST com sucesso e falha (mock httpx).
+    - **testpipelineintegration.py:** Integra pipeline com mocks de rede.
+- **notebooks/**
+  - **SantanderDevWeek2025.ipynb:** Notebook Colab para demonstração de execução do pipeline com repositório e ambiente.
+- **docs/ (Sphinx + Markdown)**
+  - **conf.py:** Configuração do Sphinx (tema, extensões).
+  - **index.rst:** Sumário da documentação.
+  - **data_dictionary.md:** Dicionário de dados (clientes e mensagens).
+  - **model_card.md:** Model Card do componente gerativo (uso, riscos, métricas).
+  - **architecture.md:** Visão da arquitetura e decisões técnicas.
+- **.github/workflows/**
+  - **ci-java.yml:** Build/test Java com JDK 25.
+  - **ci-python.yml:** Testes do ETL com Python 3.12.
+  - **docs.yml:** Build da documentação Sphinx (opcional publicação).
+- **Makefile:** Atalhos para build/run da API, venv e execução do ETL, Compose, testes e docs.
+- **.gitignore:** Ignora artefatos de build, venv, caches e envs.
+
+
+
+
+
+
+---
+
+💻 **Requisitos do Sistema**
+
+**Hardware mínimo:**
+• CPU: 4 cores
+• RAM: 8 GB (recomendado 16 GB)
+• Armazenamento: 10 GB livres em SSD
+
+
+**Software:**
+
+• Docker >= 24
+• Docker Compose >= 2
+•™Git >= 2.40
+• JDK 25
+• Python 3.12
+• Virtualenv para Python (python -m venv .venv)
+
+
+**Ambiente:**
+Variáveis de ambiente configuradas via .env (ex.: DB, JWT, API Base, IA provider)
+
+
+
+
+## Como Executar
+
+**1) Clonar o repositório**
+   
+
+```
+git clone https://github.com/Santosdevbjj/genAIpipeETLPython.git
+cd genAIpipeETLPython
+cp .env.example .env  # Edite com suas credenciais
+```
+
+
+
+**3) Subir infraestrutura (Docker)**
+   
+
+```
+make docker-up
+```
+
+
+
+**4) Rodar a API Java**
+   
+• **Local:**
+
+```
+cd api
+./gradlew clean build
+java -jar build/libs/genai-etl-api.jar
+Swagger UI: http://localhost:8080/swagger-ui
+```
+
+
+**4) Rodar o Pipeline ETL Python**
+   
+
+```
+cd etl
+python -m venv .venv
+# Linux/Mac
+source .venv/bin/activate
+# Windows
+.\.venv\Scripts\activate
+pip install -r requirements.txt
+
+python src/app.py \
+  --input data/clientes.xlsx \
+  --api-base http://localhost:8080/api \
+  --jwt "SEU_TOKEN" \
+  --channel app
+```
+
+  
+  
+**5) Rodar Notebook Colab**
+
+• Abrir notebooks/SantanderDevWeek2025.ipynb
+
+• Executar células para clonar repo, instalar dependências do ETL e rodar pipeline demonstrativo
+
+
+🧪 **Estratégia de Testes**
+
+• **Java:** Testes unitários com Mockito; integração com Testcontainers usando Postgres real
+
+• **Python:** Mocks de rede (httpx-mock) para validar ETL sem consumir tokens de IA ou depender da API online
+
+• **Arquivos importantes:**
+
+• etl/tests/test_extract.py
+
+• etl/tests/test_transform.py
+
+• etl/tests/test_load.py
+
+• etl/tests/test_pipeline_integration.py
+
+
+**Comandos:**
+
+
+```
+# Java
+./gradlew test
+# Python
+pytest -v etl/tests/
+```
+
+
+
+🧠 **Aprendizados e Desafios**
+
+• Lidar com natureza não-determinística da IA exigiu sanitização e limites rígidos de caracteres para manter consistência no banco.
+
+• Separar entidades de domínio e DTOs em Java facilitou manutenção e evolução do modelo de mensagens.
+
+• Implementar idempotência economizou recursos financeiros, evitando chamadas redundantes à API da OpenAI.
+
+• Criar testes integrados e mocks de rede aumentou a confiabilidade e reprodutibilidade do pipeline.
+
+
+📈 **Próximos Passos**
+
+• Integrar Micrometer para métricas expostas a Prometheus/Grafana
+
+• Adicionar Redis para cache de consultas frequentes
+
+• Criar dashboard em Streamlit para visualização dos resultados do ETL
+
+• Versionar prompts em Model Registry como artefatos de ML
+
+
+
+
+---
+
+**Perguntas frequentes**
+
+- **Preciso de API externa?** Não. O ETL pode operar com CSV/Excel e gravar saídas locais (JSON/MD), mas o projeto demonstra a integração com API para ciclo completo.
+- **IA generativa real?** O provider é pluggable. Use o mock durante desenvolvimento e configure um provider real (OpenAI/Azure) em produção, respeitando o Model Card.
+- **Tokens JWT:** Em dev, usar chave pública local no .env. Em prod, preferir JWKs do Authorization Server e rotação de chaves.
+
+---
+
+**Autor:** 
+  Sergio Santos 
+
+
+---
+
+**Contato:**
+
+
+[![Portfólio Sérgio Santos](https://img.shields.io/badge/Portfólio-Sérgio_Santos-111827?style=for-the-badge&logo=githubpages&logoColor=00eaff)](https://portfoliosantossergio.vercel.app)
+
+[![LinkedIn Sérgio Santos](https://img.shields.io/badge/LinkedIn-Sérgio_Santos-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/santossergioluiz)
+
+--- 
+
+
+
+
+ARQUIVOS QUE COMPÕEM O PROJETO 
+E DEVEM SER USADOS PARA ESCREVER O README.MD
+
+
+docker-compose.yml
+
+TEM ESSE CONTEÚDO 
+
+# docker-compose.yml
+version: "3.9"
+
+services:
+  postgres:
+    build:
+      context: ./docker
+      dockerfile: postgres.Dockerfile
+    container_name: genai_postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./api
+      dockerfile: ../docker/api.Dockerfile
+    container_name: genai_api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_ISSUER: ${JWT_ISSUER}
+      JWT_PUBLIC_KEY: ${JWT_PUBLIC_KEY}
+      JWT_AUDIENCE: ${JWT_AUDIENCE}
+    restart: unless-stopped
+
+volumes:
+  pgdata: 
+
+
+
+
+
+
+
+
+
+
+
+
+.env.example
+
+TEM ESSE CONTEÚDO 
+
+
+# .env.example
+SPRING_PROFILES_ACTIVE=dev
+
+# Database
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=santander
+DB_USER=postgres
+DB_PASSWORD=postgres
+
+# Security (JWT)
+JWT_ISSUER=http://localhost/issuer
+JWT_AUDIENCE=genai-api
+# Coloque a chave pública PEM (uma linha) ou use variável segura no ambiente CI/CD
+JWT_PUBLIC_KEY=-----BEGIN PUBLIC KEY-----MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A...-----END PUBLIC KEY-----
+
+# IA Provider (opcional, usado pelo ETL)
+AI_PROVIDER=mock
+AI_MODEL=gpt-4o-mini
+AI_API_KEY=replace-with-your-key
+
+# API base para ETL
+API_BASE=http://localhost:8080/api 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+docker/api.Dockerfile
+
+TEM ESSE CONTEÚDO 
+
+# docker/api.Dockerfile
+FROM eclipse-temurin:25-jre AS base
+
+WORKDIR /app
+
+# Copia o jar já construído
+COPY build/libs/genai-etl-api.jar app.jar
+
+# Healthcheck simples
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s \
+  CMD wget -qO- http://localhost:8080/actuator/health || exit 1
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "app.jar"] 
+
+
+
+
+
+
+
+
+docker/postgres.Dockerfile
+
+TEM ESSE CONTEÚDO 
+
+
+# docker/postgres.Dockerfile
+FROM postgres:16
+
+ENV POSTGRES_DB=santander
+ENV POSTGRES_USER=postgres
+ENV POSTGRES_PASSWORD=postgres
+
+# Configura local de armazenamento
+VOLUME ["/var/lib/postgresql/data"]
+
+# Sem comandos extras; o Compose gerencia init scripts se necessário
+
+
+
+
+
+
+api/src/main/java/com/santander/genai/etl/config/OpenApiConfig.java
+
+TEM ESSE CONTEÚDO 
+
+
+package com.santander.genai.etl.config;
+
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.*;
+import io.swagger.v3.oas.models.security.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class OpenApiConfig {
+
+    @Bean
+    public OpenAPI apiDocs() {
+        return new OpenAPI()
+                .info(new Info()
+                        .title("GenAI ETL API - Santander")
+                        .version("0.1.0")
+                        .description("API RESTful para clientes e mensagens de marketing com segurança OAuth2/JWT"))
+                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
+                .components(new io.swagger.v3.oas.models.Components()
+                        .addSecuritySchemes("bearerAuth",
+                                new SecurityScheme()
+                                        .name("Authorization")
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")));
+    }
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+api/src/main/java/com/santander/genai/etl/config/SecurityConfig.java
+
+TEM ESSE CONTEÚDO 
+
+
+package com.santander.genai.etl.config;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.oauth2.jwt.*;
+import org.springframework.security.web.SecurityFilterChain;
+
+import java.security.interfaces.RSAPublicKey;
+import java.util.Base64;
+
+@Configuration
+@EnableMethodSecurity
+public class SecurityConfig {
+
+    @Value("${security.jwt.issuer}")
+    private String issuer;
+
+    @Value("${security.jwt.public-key-pem}")
+    private String publicKeyPem;
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/actuator/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/clientes/**").hasAuthority("SCOPE_api:read")
+                .requestMatchers(HttpMethod.POST, "/api/clientes/**").hasAuthority("SCOPE_api:write")
+                .requestMatchers(HttpMethod.PUT, "/api/clientes/**").hasAuthority("SCOPE_api:write")
+                .requestMatchers(HttpMethod.DELETE, "/api/clientes/**").hasAuthority("SCOPE_api:write")
+                .requestMatchers("/api/mensagens/**").hasAnyAuthority("SCOPE_api:read","SCOPE_api:write")
+                .anyRequest().authenticated()
+            )
+            .oauth2ResourceServer(oauth -> oauth.jwt(Customizer.withDefaults()));
+
+        return http.build();
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        // Usa chave pública PEM (PKCS#8). Em produção, use JWK Set (issuer/.well-known/jwks.json)
+        NimbusJwtDecoder decoder = NimbusJwtDecoder.withPublicKey(parsePublicKey(publicKeyPem)).build();
+        decoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(issuer));
+        return decoder;
+    }
+
+    private RSAPublicKey parsePublicKey(String pem) {
+        String clean = pem
+                .replace("-----BEGIN PUBLIC KEY-----", "")
+                .replace("-----END PUBLIC KEY-----", "")
+                .replaceAll("\\s", "");
+        byte[] decoded = Base64.getDecoder().decode(clean);
+        return (RSAPublicKey) KeyUtils.publicKey(decoded);
+    }
+} 
+
+
+
+
+
+
+
+
+
+
+
+api/src/main/java/com/santander/genai/etl/controller/ClienteController.java
+
+TEM ESSE CONTEÚDO 
+
+
+package com.santander.genai.etl.controller;
+
+import com.santander.genai.etl.dto.ClienteDTO;
+import com.santander.genai.etl.service.ClienteService;
+import jakarta.validation.Valid;
+import org.springframework.http.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/clientes")
+public class ClienteController {
+
+    private final ClienteService service;
+
+    public ClienteController(ClienteService service) {
+        this.service = service;
+    }
+
+    @PreAuthorize("hasAuthority('SCOPE_api:write')")
+    @PostMapping
+    public ResponseEntity<ClienteDTO> criar(@Valid @RequestBody ClienteDTO dto) {
+        ClienteDTO created = service.criar(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+    @PreAuthorize("hasAuthority('SCOPE_api:read')")
+    @GetMapping("/{id}")
+    public ResponseEntity<ClienteDTO> buscar(@PathVariable Long id) {
+        return service.buscar(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PreAuthorize("hasAuthority('SCOPE_api:read')")
+    @GetMapping
+    public ResponseEntity<List<ClienteDTO>> listar() {
+        return ResponseEntity.ok(service.listar());
+    }
+
+    @PreAuthorize("hasAuthority('SCOPE_api:write')")
+    @PutMapping("/{id}")
+    public ResponseEntity<ClienteDTO> atualizar(@PathVariable Long id, @Valid @RequestBody ClienteDTO dto) {
+        return service.atualizar(id, dto)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PreAuthorize("hasAuthority('SCOPE_api:write')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+        service.deletar(id);
+        return ResponseEntity.noContent().build();
+    }
+} 
+
+
+
+
+
+
+
+
+
+
+
+api/src/main/java/com/santander/genai/etl/controller/MensagemController.java
+
+TEM ESSE CONTEÚDO 
+
+
+package com.santander.genai.etl.controller;
+
+import com.santander.genai.etl.dto.MensagemDTO;
+import com.santander.genai.etl.service.MensagemService;
+import jakarta.validation.Valid;
+import org.springframework.http.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/mensagens")
+public class MensagemController {
+
+    private final MensagemService service;
+
+    public MensagemController(MensagemService service) {
+        this.service = service;
+    }
+
+    @PreAuthorize("hasAuthority('SCOPE_api:write')")
+    @PostMapping
+    public ResponseEntity<MensagemDTO> criar(@Valid @RequestBody MensagemDTO dto) {
+        MensagemDTO created = service.criar(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+    @PreAuthorize("hasAuthority('SCOPE_api:read')")
+    @GetMapping("/{id}")
+    public ResponseEntity<MensagemDTO> buscar(@PathVariable Long id) {
+        return service.buscar(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PreAuthorize("hasAuthority('SCOPE_api:read')")
+    @GetMapping("/cliente/{clienteId}")
+    public ResponseEntity<List<MensagemDTO>> listarPorCliente(@PathVariable Long clienteId) {
+        return ResponseEntity.ok(service.listarPorCliente(clienteId));
+    }
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+api/src/main/java/com/santander/genai/etl/domain/Cliente.java
+
+TEM ESSE CONTEÚDO 
+
+
+package com.santander.genai.etl.domain;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+
+@Entity
+@Table(name = "clientes")
+public class Cliente {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotBlank
+    @Size(max = 120)
+    private String nome;
+
+    @Email
+    @NotBlank
+    @Size(max = 160)
+    private String email;
+
+    @NotBlank
+    @Size(max = 40)
+    private String segmento; // Varejo, Select, Private
+
+    @Min(0)
+    @Max(1000000)
+    private Integer limiteCredito;
+
+    @Min(0)
+    @Max(1000)
+    private Integer score;
+
+    // getters and setters
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getSegmento() { return segmento; }
+    public void setSegmento(String segmento) { this.segmento = segmento; }
+
+    public Integer getLimiteCredito() { return limiteCredito; }
+    public void setLimiteCredito(Integer limiteCredito) { this.limiteCredito = limiteCredito; }
+
+    public Integer getScore() { return score; }
+    public void setScore(Integer score) { this.score = score; }
+} 
+
+
+
+
+
+
+
+
+
+
+api/src/main/java/com/santander/genai/etl/domain/MensagemMarketing.java
+
+
+TEM ESSE CONTEÚDO 
+
+
+
+package com.santander.genai.etl.domain;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+import java.time.OffsetDateTime;
+
+@Entity
+@Table(name = "mensagens_marketing")
+public class MensagemMarketing {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name="cliente_id", nullable=false)
+    private Long clienteId;
+
+    @NotBlank
+    @Size(max = 1000)
+    @Column(columnDefinition = "TEXT")
+    private String texto;
+
+    @NotBlank
+    @Size(max = 20)
+    private String canal; // email, sms, app
+
+    @Column(name="modelo_versao", length=50)
+    private String modeloVersao;
+
+    @Column(name="created_at", nullable=false)
+    private OffsetDateTime createdAt = OffsetDateTime.now();
+
+    // getters and setters
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public Long getClienteId() { return clienteId; }
+    public void setClienteId(Long clienteId) { this.clienteId = clienteId; }
+
+    public String getTexto() { return texto; }
+    public void setTexto(String texto) { this.texto = texto; }
+
+    public String getCanal() { return canal; }
+    public void setCanal(String canal) { this.canal = canal; }
+
+    public String getModeloVersao() { return modeloVersao; }
+    public void setModeloVersao(String modeloVersao) { this.modeloVersao = modeloVersao; }
+
+    public OffsetDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(OffsetDateTime createdAt) { this.createdAt = createdAt; }
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+api/src/main/java/com/santander/genai/etl/dto/ClienteDTO.java
+
+TEM ESSE CONTEÚDO 
+
+
+
+package com.santander.genai.etl.dto;
+
+import jakarta.validation.constraints.*;
+
+public class ClienteDTO {
+
+    private Long id;
+
+    @NotBlank
+    @Size(max = 120)
+    private String nome;
+
+    @Email
+    @NotBlank
+    @Size(max = 160)
+    private String email;
+
+    @NotBlank
+    @Size(max = 40)
+    private String segmento;
+
+    @Min(0)
+    @Max(1000000)
+    private Integer limiteCredito;
+
+    @Min(0)
+    @Max(1000)
+    private Integer score;
+
+    // getters and setters
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getSegmento() { return segmento; }
+    public void setSegmento(String segmento) { this.segmento = segmento; }
+
+    public Integer getLimiteCredito() { return limiteCredito; }
+    public void setLimiteCredito(Integer limiteCredito) { this.limiteCredito = limiteCredito; }
+
+    public Integer getScore() { return score; }
+    public void setScore(Integer score) { this.score = score; }
+} 
+
+
+
+
+
+
+
+
+api/src/main/java/com/santander/genai/etl/dto/MensagemDTO.java
+
+TEM ESSE CONTEÚDO 
+
+
+package com.santander.genai.etl.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
+public class MensagemDTO {
+
+    private Long id;
+
+    @NotNull
+    private Long clienteId;
+
+    @NotBlank
+    @Size(max = 1000)
+    private String texto;
+
+    @NotBlank
+    @Size(max = 20)
+    private String canal;
+
+    private String modeloVersao;
+
+    // getters and setters
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public Long getClienteId() { return clienteId; }
+    public void setClienteId(Long clienteId) { this.clienteId = clienteId; }
+
+    public String getTexto() { return texto; }
+    public void setTexto(String texto) { this.texto = texto; }
+
+    public String getCanal() { return canal; }
+    public void setCanal(String canal) { this.canal = canal; }
+
+    public String getModeloVersao() { return modeloVersao; }
+    public void setModeloVersao(String modeloVersao) { this.modeloVersao = modeloVersao; }
+} 
+
+
+
+
+
+
+
+
+
+
+api/src/main/java/com/santander/genai/etl/mapper/DtoMapper.java
+
+TEM ESSE CONTEÚDO 
+
+
+package com.santander.genai.etl.mapper;
+
+import com.santander.genai.etl.domain.Cliente;
+import com.santander.genai.etl.domain.MensagemMarketing;
+import com.santander.genai.etl.dto.ClienteDTO;
+import com.santander.genai.etl.dto.MensagemDTO;
+import org.springframework.stereotype.Component;
+
+@Component
+public class DtoMapper {
+
+    public ClienteDTO toDto(Cliente c) {
+        ClienteDTO dto = new ClienteDTO();
+        dto.setId(c.getId());
+        dto.setNome(c.getNome());
+        dto.setEmail(c.getEmail());
+        dto.setSegmento(c.getSegmento());
+        dto.setLimiteCredito(c.getLimiteCredito());
+        dto.setScore(c.getScore());
+        return dto;
+    }
+
+    public Cliente toEntity(ClienteDTO dto) {
+        Cliente c = new Cliente();
+        c.setId(dto.getId());
+        c.setNome(dto.getNome());
+        c.setEmail(dto.getEmail());
+        c.setSegmento(dto.getSegmento());
+        c.setLimiteCredito(dto.getLimiteCredito());
+        c.setScore(dto.getScore());
+        return c;
+    }
+
+    public MensagemDTO toDto(MensagemMarketing m) {
+        MensagemDTO dto = new MensagemDTO();
+        dto.setId(m.getId());
+        dto.setClienteId(m.getClienteId());
+        dto.setTexto(m.getTexto());
+        dto.setCanal(m.getCanal());
+        dto.setModeloVersao(m.getModeloVersao());
+        return dto;
+    }
+
+    public MensagemMarketing toEntity(MensagemDTO dto) {
+        MensagemMarketing m = new MensagemMarketing();
+        m.setId(dto.getId());
+        m.setClienteId(dto.getClienteId());
+        m.setTexto(dto.getTexto());
+        m.setCanal(dto.getCanal());
+        m.setModeloVersao(dto.getModeloVersao());
+        return m;
+    }
+} 
+
+
+
+
+
+
+
+
+
+api/src/main/java/com/santander/genai/etl/repository/ClienteRepository.java
+
+TEM ESSE CONTEÚDO 
+
+
+package com.santander.genai.etl.repository;
+
+import com.santander.genai.etl.domain.Cliente;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ClienteRepository extends JpaRepository<Cliente, Long> {
+} 
+
+
+
+
+
+
+
+
+
+api/src/main/java/com/santander/genai/etl/repository/MensagemMarketingRepository.java
+
+
+
+TEM ESSE CONTEÚDO 
+
+
+
+package com.santander.genai.etl.repository;
+
+import com.santander.genai.etl.domain.MensagemMarketing;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface MensagemMarketingRepository extends JpaRepository<MensagemMarketing, Long> {
+    List<MensagemMarketing> findByClienteId(Long clienteId);
+} 
+
+
+
+
+
+
+
+
+
+
+api/src/main/java/com/santander/genai/etl/service/impl/ClienteServiceImpl.java
+
+TEM ESSE CONTEÚDO 
+
+
+
+package com.santander.genai.etl.service.impl;
+
+import com.santander.genai.etl.domain.Cliente;
+import com.santander.genai.etl.dto.ClienteDTO;
+import com.santander.genai.etl.mapper.DtoMapper;
+import com.santander.genai.etl.repository.ClienteRepository;
+import com.santander.genai.etl.service.ClienteService;
+import com.santander.genai.etl.util.ValidationUtil;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class ClienteServiceImpl implements ClienteService {
+
+    private final ClienteRepository repository;
+    private final DtoMapper mapper;
+
+    public ClienteServiceImpl(ClienteRepository repository, DtoMapper mapper) {
+        this.repository = repository;
+        this.mapper = mapper;
+    }
+
+    @Override
+    public ClienteDTO criar(ClienteDTO dto) {
+        ValidationUtil.validateClienteDTO(dto);
+        Cliente entity = mapper.toEntity(dto);
+        entity = repository.save(entity);
+        return mapper.toDto(entity);
+    }
+
+    @Override
+    public Optional<ClienteDTO> buscar(Long id) {
+        return repository.findById(id).map(mapper::toDto);
+    }
+
+    @Override
+    public List<ClienteDTO> listar() {
+        return repository.findAll().stream().map(mapper::toDto).toList();
+    }
+
+    @Override
+    public Optional<ClienteDTO> atualizar(Long id, ClienteDTO dto) {
+        return repository.findById(id).map(existing -> {
+            existing.setNome(dto.getNome());
+            existing.setEmail(dto.getEmail());
+            existing.setSegmento(dto.getSegmento());
+            existing.setLimiteCredito(dto.getLimiteCredito());
+            existing.setScore(dto.getScore());
+            return mapper.toDto(repository.save(existing));
+        });
+    }
+
+    @Override
+    public void deletar(Long id) {
+        repository.deleteById(id);
+    }
+} 
+
+
+
+
+
+
+
+api/src/main/java/com/santander/genai/etl/service/impl/MensagemServiceImpl.java
+
+
+TEM ESSE CONTEÚDO 
+
+
+package com.santander.genai.etl.service.impl;
+
+import com.santander.genai.etl.domain.MensagemMarketing;
+import com.santander.genai.etl.dto.MensagemDTO;
+import com.santander.genai.etl.mapper.DtoMapper;
+import com.santander.genai.etl.repository.MensagemMarketingRepository;
+import com.santander.genai.etl.service.MensagemService;
+import com.santander.genai.etl.util.IdempotencyUtil;
+import com.santander.genai.etl.util.ValidationUtil;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class MensagemServiceImpl implements MensagemService {
+
+    private final MensagemMarketingRepository repository;
+    private final DtoMapper mapper;
+
+    public MensagemServiceImpl(MensagemMarketingRepository repository, DtoMapper mapper) {
+        this.repository = repository;
+        this.mapper = mapper;
+    }
+
+    @Override
+    public MensagemDTO criar(MensagemDTO dto) {
+        ValidationUtil.validateMensagemDTO(dto);
+
+        // Idempotência básica: evita duplicar o mesmo texto para o mesmo cliente/canal
+        List<MensagemMarketing> existentes = repository.findByClienteId(dto.getClienteId());
+        String fingerprint = IdempotencyUtil.fingerprint(dto.getClienteId(), dto.getTexto(), dto.getCanal());
+        boolean duplicada = existentes.stream().anyMatch(m ->
+                IdempotencyUtil.fingerprint(m.getClienteId(), m.getTexto(), m.getCanal()).equals(fingerprint));
+        if (duplicada) {
+            return mapper.toDto(existentes.stream()
+                    .filter(m -> IdempotencyUtil.fingerprint(m.getClienteId(), m.getTexto(), m.getCanal()).equals(fingerprint))
+                    .findFirst().get());
+        }
+
+        MensagemMarketing entity = mapper.toEntity(dto);
+        entity = repository.save(entity);
+        return mapper.toDto(entity);
+    }
+
+    @Override
+    public Optional<MensagemDTO> buscar(Long id) {
+        return repository.findById(id).map(mapper::toDto);
+    }
+
+    @Override
+    public List<MensagemDTO> listarPorCliente(Long clienteId) {
+        return repository.findByClienteId(clienteId).stream().map(mapper::toDto).toList();
+    }
+} 
+
+
+
+
+
+
+
+
+api/src/main/java/com/santander/genai/etl/service/ClienteService.java
+
+
+TEM ESSE CONTEÚDO 
+
+
+package com.santander.genai.etl.service;
+
+import com.santander.genai.etl.dto.ClienteDTO;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface ClienteService {
+    ClienteDTO criar(ClienteDTO dto);
+    Optional<ClienteDTO> buscar(Long id);
+    List<ClienteDTO> listar();
+    Optional<ClienteDTO> atualizar(Long id, ClienteDTO dto);
+    void deletar(Long id);
+} 
+
+
+
+
+
+
+
+
+
+api/src/main/java/com/santander/genai/etl/service/MensagemService.java
+
+
+TEM ESSE CONTEÚDO 
+
+
+package com.santander.genai.etl.service;
+
+import com.santander.genai.etl.dto.MensagemDTO;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface MensagemService {
+    MensagemDTO criar(MensagemDTO dto);
+    Optional<MensagemDTO> buscar(Long id);
+    List<MensagemDTO> listarPorCliente(Long clienteId);
+} 
+
+
+
+
+
+
+
+
+
+
+
+api/src/main/java/com/santander/genai/etl/util/IdempotencyUtil.java
+
+TEM ESSE CONTEÚDO 
+
+
+
+package com.santander.genai.etl.util;
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+public final class IdempotencyUtil {
+
+    private IdempotencyUtil() {}
+
+    public static String fingerprint(Long clienteId, String texto, String canal) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            String base = clienteId + "|" + canal + "|" + texto;
+            byte[] hash = md.digest(base.getBytes(StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hash) sb.append(String.format("%02x", b));
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 not available", e);
+        }
+    }
+} 
+
+
+
+
+
+
+
+
+
+
+
+api/src/main/java/com/santander/genai/etl/util/ValidationUtil.java 
+
+
+TEM ESSE CONTEÚDO 
+
+
+
+package com.santander.genai.etl.util;
+
+import com.santander.genai.etl.dto.ClienteDTO;
+import com.santander.genai.etl.dto.MensagemDTO;
+
+public final class ValidationUtil {
+
+    private ValidationUtil() {}
+
+    public static void validateClienteDTO(ClienteDTO dto) {
+        if (dto.getNome() == null || dto.getNome().isBlank()) {
+            throw new IllegalArgumentException("Nome é obrigatório");
+        }
+        if (dto.getEmail() == null || dto.getEmail().isBlank()) {
+            throw new IllegalArgumentException("Email é obrigatório");
+        }
+        if (dto.getSegmento() == null || dto.getSegmento().isBlank()) {
+            throw new IllegalArgumentException("Segmento é obrigatório");
+        }
+    }
+
+    public static void validateMensagemDTO(MensagemDTO dto) {
+        if (dto.getClienteId() == null) {
+            throw new IllegalArgumentException("ClienteId é obrigatório");
+        }
+        if (dto.getTexto() == null || dto.getTexto().isBlank()) {
+            throw new IllegalArgumentException("Texto é obrigatório");
+        }
+        if (dto.getCanal() == null || dto.getCanal().isBlank()) {
+            throw new IllegalArgumentException("Canal é obrigatório");
+        }
+    }
+} 
+
+
+
+
+
+
+
+
+
+
+
+api/src/main/java/com/santander/genai/etl/GenAiEtlApplication.java
+
+
+TEM ESSE CONTEÚDO 
+
+
+package com.santander.genai.etl;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class GenAiEtlApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(GenAiEtlApplication.class, args);
+    }
+} 
+
+
+
+
+
+
+
+
+
+
+
+api/src/main/resources/db/migration/V1__init.sql
+
+
+TEM ESSE CONTEÚDO 
+
+-- api/src/main/resources/db/migration/V1__init.sql
+
+CREATE TABLE IF NOT EXISTS clientes (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(120) NOT NULL,
+    email VARCHAR(160) NOT NULL,
+    segmento VARCHAR(40) NOT NULL,
+    limite_credito INT CHECK (limite_credito >= 0),
+    score INT CHECK (score >= 0 AND score <= 1000)
+);
+
+CREATE TABLE IF NOT EXISTS mensagens_marketing (
+    id SERIAL PRIMARY KEY,
+    cliente_id BIGINT NOT NULL REFERENCES clientes(id) ON DELETE CASCADE,
+    texto TEXT NOT NULL,
+    canal VARCHAR(20) NOT NULL,
+    modelo_versao VARCHAR(50),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_mensagens_cliente ON mensagens_marketing (cliente_id); 
+
+
+
+
+
+
+
+
+
+
+api/src/main/resources/application-dev.yml
+
+TEM ESSE CONTEÚDO 
+
+
+spring:
+  datasource:
+    host: localhost
+    port: 5432
+    database: santander
+    username: postgres
+    password: postgres 
+
+
+
+
+
+
+
+
+
+
+api/src/main/resources/application.yml
+
+TEM ESSE CONTEÚDO 
+
+
+server:
+  port: 8080
+
+spring:
+  application:
+    name: genai-etl-api
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:${spring.datasource.host}}:${DB_PORT:${spring.datasource.port}}/${DB_NAME:${spring.datasource.database}}
+    username: ${DB_USER:${spring.datasource.username}}
+    password: ${DB_PASSWORD:${spring.datasource.password}}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+security:
+  jwt:
+    issuer: ${JWT_ISSUER}
+    audience: ${JWT_AUDIENCE}
+    public-key-pem: ${JWT_PUBLIC_KEY} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+api/src/tests/java/com/santander/genai/etl/controller/ClienteControllerTest.java
+
+TEM ESSE CONTEÚDO 
+
+package com.santander.genai.etl.controller;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.santander.genai.etl.dto.ClienteDTO;
+import com.santander.genai.etl.service.ClienteService;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+public class ClienteControllerTest {
+
+    @Test
+    void criar_sem_token_deve_403_quando_security_habilitada() throws Exception {
+        ClienteService service = Mockito.mock(ClienteService.class);
+        ClienteController controller = new ClienteController(service);
+        MockMvc mvc = MockMvcBuilders.standaloneSetup(controller).build();
+
+        ClienteDTO dto = new ClienteDTO();
+        dto.setNome("João");
+        dto.setEmail("joao@santander.com");
+        dto.setSegmento("Varejo");
+
+        mvc.perform(post("/api/clientes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(dto)))
+                .andExpect(status().is4xxClientError());
+    }
+} 
+
+
+
+
+
+
+
+
+
+
+
+api/src/tests/java/com/santander/genai/etl/repository/ClienteRepositoryTest.java
+
+
+TEM ESSE CONTEÚDO 
+
+
+package com.santander.genai.etl.repository;
+
+import org.junit.jupiter.api.Test;
+
+public class ClienteRepositoryTest {
+    @Test
+    void placeholder() {
+        // Testes de integração com Testcontainers podem ser adicionados aqui.
+        // Mantido simples para exemplo.
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+api/src/tests/java/com/santander/genai/etl/service/ClienteServiceTest.java
+
+
+TEM ESSE CONTEÚDO 
+
+
+package com.santander.genai.etl.service;
+
+import com.santander.genai.etl.dto.ClienteDTO;
+import com.santander.genai.etl.mapper.DtoMapper;
+import com.santander.genai.etl.domain.Cliente;
+import com.santander.genai.etl.repository.ClienteRepository;
+import com.santander.genai.etl.service.impl.ClienteServiceImpl;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+public class ClienteServiceTest {
+
+    @Test
+    void criarCliente_ok() {
+        ClienteRepository repo = Mockito.mock(ClienteRepository.class);
+        DtoMapper mapper = new DtoMapper();
+        ClienteService service = new ClienteServiceImpl(repo, mapper);
+
+        ClienteDTO dto = new ClienteDTO();
+        dto.setNome("Maria");
+        dto.setEmail("maria@santander.com");
+        dto.setSegmento("Varejo");
+        dto.setLimiteCredito(5000);
+        dto.setScore(750);
+
+        Mockito.when(repo.save(Mockito.any(Cliente.class))).thenAnswer(inv -> {
+            Cliente c = inv.getArgument(0);
+            c.setId(1L);
+            return c;
+        });
+
+        ClienteDTO criado = service.criar(dto);
+        assertThat(criado.getId()).isEqualTo(1L);
+        assertThat(criado.getNome()).isEqualTo("Maria");
+    }
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+api/build.gradle
+
+
+TEM ESSE CONTEÚDO 
+
+// api/build.gradle
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '4.0.0'
+    id 'io.spring.dependency-management' version '1.1.5'
+}
+
+group = 'com.santander.genai.etl'
+version = '0.1.0'
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.security:spring-security-oauth2-resource-server'
+    implementation 'org.springframework.security:spring-security-oauth2-jose'
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+
+    runtimeOnly 'org.postgresql:postgresql:42.7.3'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.mockito:mockito-core:5.12.0'
+    testImplementation 'org.testcontainers:junit-jupiter:1.20.1'
+    testImplementation 'org.testcontainers:postgresql:1.20.1'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+bootJar {
+    archiveFileName = 'genai-etl-api.jar'
+} 
+
+
+
+
+
+
+
+
+
+
+
+api/settings.gradle
+
+TEM ESSE CONTEÚDO 
+
+
+// api/settings.gradle
+rootProject.name = 'genai-etl-api' 
+
+
+
+
+
+
+
+
+docs/architecture.md
+
+TEM ESSE CONTEÚDO 
+
+# Arquitetura
+
+- **API Java (Spring Boot):** camadas Controller → Service → Repository; segurança OAuth2/JWT; JPA + Flyway.
+- **Banco:** PostgreSQL (ACID) com migrações versionadas.
+- **ETL Python:** E (planilha/CSV/API), T (prompt + IA generativa + sanitização), L (POST na API).
+- **Infra:** Docker Compose, ambientes via `.env`.
+- **Testes:** JUnit/Mockito/Testcontainers (Java) e Pytest (Python).
+- **Docs:** Sphinx + Markdown; publicação opcional em GitHub Pages. 
+
+
+
+
+
+
+
+
+
+
+
+
+docs/conf.py
+
+TEM ESSE CONTEÚDO 
+
+
+# docs/conf.py
+project = 'GenAI ETL - Santander'
+author = 'Equipe'
+release = '0.1.0'
+
+extensions = ['myst_parser']
+templates_path = ['_templates']
+exclude_patterns = []
+
+html_theme = 'sphinx_rtd_theme'
+html_static_path = ['_static'] 
+
+
+
+
+
+
+
+
+
+
+
+
+docs/data_dictionary.md
+
+
+TEM ESSE CONTEÚDO 
+
+
+
+# Dicionário de Dados
+
+## Cliente
+- **id:** inteiro, PK.
+- **nome:** string (<=120), obrigatório.
+- **email:** string, RFC 5322, obrigatório.
+- **segmento:** enum {Varejo, Select, Private}, obrigatório.
+- **limite_credito:** inteiro >=0.
+- **score:** inteiro [0, 1000].
+
+## MensagemMarketing
+- **id:** inteiro, PK.
+- **cliente_id:** FK -> clientes.id, obrigatório.
+- **texto:** texto (<=1000), obrigatório.
+- **canal:** enum {email, sms, app}, obrigatório.
+- **modelo_versao:** string.
+- **created_at:** timestamp, gerado pelo sistema. 
+
+
+
+
+
+
+
+
+
+
+
+docs/index.rst
+
+TEM ESSE CONTEÚDO 
+
+GenAI ETL - Santander
+=====================
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Conteúdo
+
+   data_dictionary
+   model_card
+   architecture 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+docs/model_card.md
+
+TEM ESSE CONTEÚDO 
+
+
+**Personalização de Marketing com IA (GPT-4)**
+
+​Este Model Card detalha o uso do componente de Inteligência Artificial Generativa dentro do pipeline de ETL para a geração de mensagens de marketing personalizadas.
+
+**​1. Detalhes do Modelo**
+
+• ​Desenvolvedor: Sérgio Santos (Integração via OpenAI GPT-4)
+
+• ​Data da Versão: Novembro, 2025
+
+​• Tipo de Modelo: Large Language Model (LLM) baseado em Transformer.
+
+• ​Documentação Relacionada: Prompts Base | Regras de Segurança
+
+​**2. Uso Pretendido**
+
+​Caso de Uso Primário: Geração automática de textos curtos para notificações (App, SMS, E-mail) baseados no segmento do cliente (Varejo, Select, Private).
+
+​**Entradas (Features):** - Nome do Cliente (para saudação).
+
+• ​Segmento de conta.
+
+• ​Limite de crédito atual.
+
+• ​Score de crédito.
+
+​• **Saída:** Mensagem de até 600 caracteres com tom profissional, empático e focado em benefícios.
+
+**​3. Fatores de Desempenho e Métricas**
+
+• **​KPIs de Negócio:** Taxa de Abertura (CTR), Conversão de Produtos Oferecidos.
+​Métricas Técnicas:
+
+• **​Latência:** Tempo médio de resposta da API de IA por registro.
+
+• **​Taxa de Sucesso do ETL:** Porcentagem de mensagens geradas que passaram na sanitização de caracteres.
+
+• **Idempotência:** Eficácia do Hash SHA-256 em evitar chamadas duplicadas.
+
+**​4. Dados de Treinamento e Prompt Engineering**
+
+• ​**Prompt Base:** O modelo utiliza few-shot prompting para garantir que o tom de voz do banco seja respeitado.
+
+• ""​Variáveis Dinâmicas:** Os dados são injetados via templates Pydantic no Python para evitar prompt injection.
+
+**​5. Limitações e Riscos**
+
+• ​Alucinações: O modelo pode sugerir benefícios que não existem no produto real se o prompt não for restritivo.
+
+• ​Custo: Chamadas frequentes a modelos de ponta (GPT-4) podem encarecer o pipeline se não houver cache/idempotência.
+
+• ​Privacidade (LGPD): Nenhum dado sensível como CPF, senhas ou histórico detalhado de transações é enviado ao provedor de IA. Apenas dados de segmentação e limites.
+
+**​6. Governança e Segurança**
+
+• **​Filtros de Conteúdo:** O pipeline contém uma camada de sanitização (etl/src/etl/transform.py) que remove caracteres especiais indesejados e valida o comprimento da mensagem.
+
+• **​Safety Rules:*** Implementação de regras que impedem a geração de conteúdo ofensivo ou promessas financeiras irrealistas.  
+
+
+
+
+
+
+
+
+
+
+
+etl/src/etl/clients/ai_provider.py
+
+TEM ESSE CONTEÚDO 
+
+
+# etl/src/etl/clients/ai_provider.py
+from typing import Protocol
+
+class AIProvider(Protocol):
+    def generate(self, prompt: str) -> str: ...
+
+class MockAIProvider:
+    def generate(self, prompt: str) -> str:
+        # Retorna um texto simples para desenvolvimento e testes
+        return ("Olá! Vimos que você está aproveitando seus produtos. "
+                "Que tal explorar benefícios exclusivos no app Santander? "
+                "Acompanhe seu limite e oportunidades com responsabilidade. "
+                "Acesse o app e conheça as novidades.")
+
+# Exemplo de adaptação para provedores reais (OpenAI/Azure) pode ser feito aqui,
+# mantendo esta interface. 
+
+
+
+
+
+
+
+
+
+
+
+
+etl/src/etl/clients/api_client.py
+
+
+TEM ESSE CONTEÚDO 
+
+
+# etl/src/etl/clients/api_client.py
+from typing import Dict, Any
+import httpx
+
+class ApiClient:
+    def __init__(self, base_url: str, jwt_token: str, timeout: int = 20):
+        self.base_url = base_url.rstrip("/")
+        self.jwt_token = jwt_token
+        self.timeout = timeout
+
+    def _headers(self) -> Dict[str, str]:
+        return {"Authorization": f"Bearer {self.jwt_token}"}
+
+    def get_cliente(self, cliente_id: int) -> Dict[str, Any]:
+        with httpx.Client(timeout=self.timeout) as client:
+            resp = client.get(f"{self.base_url}/clientes/{cliente_id}", headers=self._headers())
+            resp.raise_for_status()
+            return resp.json()
+
+    def post_mensagem(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        with httpx.Client(timeout=self.timeout) as client:
+            resp = client.post(f"{self.base_url}/mensagens", json=payload, headers=self._headers())
+            resp.raise_for_status()
+            return resp.json() 
+
+
+
+
+
+
+
+
+
+
+etl/src/etl/models/customer.py
+
+TEM ESSE CONTEÚDO 
+
+
+# etl/src/etl/models/customer.py
+from pydantic import BaseModel, EmailStr
+
+class Customer(BaseModel):
+    id: int
+    nome: str
+    email: EmailStr
+    segmento: str
+    limiteCredito: int | None = 0
+    score: int | None = 0 
+
+
+
+
+
+
+
+
+
+
+etl/src/etl/models/message.py
+
+
+# etl/src/etl/models/message.py
+from pydantic import BaseModel
+
+class Message(BaseModel):
+    clienteId: int
+    texto: str
+    canal: str
+    modeloVersao: str = "genai-v1" 
+
+
+
+
+
+
+
+
+
+
+etl/src/etl/prompts/base_prompt.txt
+
+TEM ESSE CONTEÚDO 
+
+
+Você é um redator do Santander. Gere uma mensagem curta, clara e empática.
+Evite linguagem sensacionalista e promessas irreais.
+Inclua uma chamada à ação discreta e personalizada.
+Limite: 600 caracteres. 
+
+
+
+
+
+
+
+
+
+etl/src/etl/prompts/safety_rules.md
+
+TEM ESSE CONTEÚDO 
+
+
+- Sem informações sensíveis do cliente.
+- Sem recomendações financeiras específicas ou garantias.
+- Evitar linguagem discriminatória ou viesada.
+- Tom profissional e respeitoso.
+- Sem links externos; foco no app Santander.
+
+
+
+
+
+
+
+
+
+
+
+etl/src/etl/utils/io.py
+
+TEM ESSE CONTEÚDO 
+
+
+# etl/src/etl/utils/io.py
+import os
+
+def read_file(path: str) -> str:
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read()
+
+def ensure_dir(path: str):
+    os.makedirs(path, exist_ok=True) 
+
+
+
+
+
+
+
+
+
+
+
+
+
+etl/src/etl/utils/logging.py
+
+TEM ESSE CONTEÚDO 
+
+
+# etl/src/etl/utils/logging.py
+from loguru import logger
+
+logger.add("etl.log", rotation="500 KB", level="INFO", enqueue=True, backtrace=False, diagnose=False) 
+
+
+
+
+
+
+
+
+
+etl/src/etl/utils/validation.py
+
+TEM ESSE CONTEÚDO 
+
+
+# etl/src/etl/utils/validation.py
+def is_valid_channel(ch: str) -> bool:
+    return ch in {"email", "sms", "app"}
+
+
+
+
+
+
+
+
+
+
+etl/src/etl/__init__.py
+
+
+TEM ESSE CONTEÚDO 
+
+# etl/src/etl/__init__.py
+__all__ = [] 
+
+
+
+
+
+
+
+
+
+
+
+
+
+etl/src/etl/extract.py
+
+
+TEM ESSE CONTEÚDO 
+
+
+# etl/src/etl/extract.py
+from typing import List
+import pandas as pd
+from .utils.logging import logger
+
+def read_ids_from_sheet(path: str) -> List[int]:
+    logger.info(f"Lendo planilha/CSV: {path}")
+    if path.endswith(".xlsx"):
+        df = pd.read_excel(path)
+    else:
+        df = pd.read_csv(path)
+    ids = df["id"].dropna().astype(int).tolist()
+    logger.info(f"IDs extraídos: {ids}")
+    return ids
+
+def fetch_customers_from_api(api_base: str, ids: List[int], jwt_token: str) -> List[dict]:
+    import httpx
+    headers = {"Authorization": f"Bearer {jwt_token}"}
+    customers = []
+    with httpx.Client(timeout=20) as client:
+        for cid in ids:
+            resp = client.get(f"{api_base}/clientes/{cid}", headers=headers)
+            if resp.status_code == 200:
+                customers.append(resp.json())
+            else:
+                logger.warning(f"Cliente {cid} não encontrado ou erro {resp.status_code}")
+    return customers 
+
+
+
+
+
+
+
+
+
+etl/src/etl/load.py
+
+TEM ESSE CONTEÚDO 
+
+
+
+# etl/src/etl/load.py
+import httpx
+from .utils.logging import logger
+
+def post_message(api_base: str, cliente_id: int, texto: str, canal: str, jwt_token: str, modelo_versao: str = "genai-v1") -> dict:
+    headers = {"Authorization": f"Bearer {jwt_token}"}
+    payload = {
+        "clienteId": cliente_id,
+        "texto": texto,
+        "canal": canal,
+        "modeloVersao": modelo_versao
+    }
+    logger.info(f"POST mensagem para cliente {cliente_id} canal {canal}")
+    with httpx.Client(timeout=20) as client:
+        resp = client.post(f"{api_base}/mensagens", json=payload, headers=headers)
+        resp.raise_for_status()
+        return resp.json()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+etl/src/etl/pipeline.py
+
+
+TEM ESSE CONTEÚDO 
+
+
+# etl/src/etl/pipeline.py
+from typing import Iterable
+from .extract import read_ids_from_sheet, fetch_customers_from_api
+from .transform import build_prompt, sanitize_output
+from .load import post_message
+from .clients.ai_provider import AIProvider
+from .utils.logging import logger
+
+def run_pipeline(input_path: str, api_base: str, jwt_token: str, ai_provider: AIProvider,
+                 channel: str = "app", ids: Iterable[int] | None = None):
+    if ids is None:
+        ids = read_ids_from_sheet(input_path)
+
+    customers = fetch_customers_from_api(api_base, ids, jwt_token)
+
+    for c in customers:
+        prompt = build_prompt(c)
+        raw_text = ai_provider.generate(prompt)
+        text = sanitize_output(raw_text)
+        result = post_message(api_base, c["id"], text, channel, jwt_token, modelo_versao="genai-v1")
+        logger.info(f"Mensagem criada: {result.get('id')} para cliente {c['id']}") 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+etl/src/etl/transform.py 
+
+
+TEM ESSE CONTEÚDO 
+
+
+# etl/src/etl/transform.py
+from textwrap import dedent
+
+def build_prompt(c: dict) -> str:
+    nome = c.get("nome", "Cliente")
+    segmento = c.get("segmento", "Varejo")
+    limite = c.get("limiteCredito", 0)
+    score = c.get("score", 0)
+    return dedent(f"""
+    Você é um redator do Santander. Crie uma mensagem curta e clara para {nome}.
+    Segmento: {segmento}. Limite atual: {limite}. Score: {score}.
+    Objetivo: aumentar engajamento e uso responsável de crédito.
+    Tom: profissional, empático, sem promessas irreais.
+    Inclua uma chamada à ação discreta e personalizada.
+    Saída com no máximo 600 caracteres.
+    """)
+
+def sanitize_output(text: str) -> str:
+    cleaned = " ".join(text.split())
+    if len(cleaned) > 600:
+        cleaned = cleaned[:600]
+    return cleaned 
+
+
+
+
+
+
+
+
+
+
+
+
+etl/src/app.py
+
+
+TEM ESSE CONTEÚDO 
+
+
+# etl/src/app.py
+import argparse
+import os
+from dotenv import load_dotenv
+
+from etl.clients.ai_provider import MockAIProvider
+from etl.pipeline import run_pipeline
+
+def main():
+    load_dotenv()
+    parser = argparse.ArgumentParser(description="Executa pipeline ETL com IA generativa")
+    parser.add_argument("--input", required=True, help="Caminho da planilha/CSV com coluna 'id'")
+    parser.add_argument("--api-base", default=os.getenv("API_BASE", "http://localhost:8080/api"))
+    parser.add_argument("--jwt", default=os.getenv("JWT_TOKEN", ""))
+    parser.add_argument("--channel", default="app", choices=["app", "email", "sms"])
+    args = parser.parse_args()
+
+    ai = MockAIProvider()
+    run_pipeline(args.input, args.api_base, args.jwt, ai, channel=args.channel)
+
+if __name__ == "__main__":
+    main() 
+
+
+
+
+
+
+
+
+
+
+
+etl/tests/test_extract.py
+
+TEM ESSE CONTEÚDO 
+
+
+import pandas as pd
+from etl.extract import read_ids_from_sheet
+
+def test_read_ids_from_csv(tmp_path):
+    p = tmp_path / "ids.csv"
+    pd.DataFrame({"id": [1, 2, 3]}).to_csv(p, index=False)
+    ids = read_ids_from_sheet(str(p))
+    assert ids == [1, 2, 3] 
+
+
+
+
+
+
+
+
+
+
+
+
+
+etl/tests/test_load.py
+
+
+TEM ESSE CONTEÚDO 
+
+
+
+import httpx
+import pytest
+from etl.load import post_message
+
+def test_post_message_raises_on_error(httpx_mock):
+    httpx_mock.add_response(method="POST", url="http://x/api/mensagens", status_code=400)
+    with pytest.raises(httpx.HTTPStatusError):
+        post_message("http://x/api", 1, "t", "app", "jwt")
+
+def test_post_message_ok(httpx_mock):
+    httpx_mock.add_response(method="POST", url="http://x/api/mensagens", json={"id": 10}, status_code=201)
+    r = post_message("http://x/api", 1, "t", "app", "jwt")
+    assert r["id"] == 10 
+
+
+
+
+
+
+
+
+
+
+
+
+etl/tests/test_pipeline_integration.py
+
+TEM ESSE CONTEÚDO 
+
+
+
+from etl.pipeline import run_pipeline
+from etl.clients.ai_provider import MockAIProvider
+# Importamos o tipo de erro esperado para fazer asserts
+from httpx import ConnectError 
+# Importamos o fixture httpx_mock, que é injetado pelo pytest-httpx
+
+# 💡 NOVO: Adicionamos o fixture 'httpx_mock' na assinatura da função.
+def test_pipeline_runs_successfully(httpx_mock):
+    # O API_BASE usado aqui deve corresponder à URL base usada no seu código.
+    api_base = "http://localhost:8080/api"
+    customer_id = 1
+    
+    # ----------------------------------------------------
+    # 1. Simular a resposta da chamada de EXTRAÇÃO (GET /clientes/{id})
+    # O httpx_mock irá interceptar a chamada feita pelo 'etl.extract'
+    httpx_mock.add_response(
+        url=f"{api_base}/clientes/{customer_id}",
+        method="GET",
+        # Resposta que o seu teste espera para o processamento
+        json={
+            "id": 1, 
+            "nome": "Sergio", 
+            "segmento": "Varejo", 
+            "limiteCredito": 2000, 
+            "score": 700
+        }
+    )
+
+    # ----------------------------------------------------
+    # 2. Simular a resposta da chamada de LOAD (POST /mensagens)
+    # O httpx_mock irá interceptar a chamada feita pelo 'etl.load'
+    httpx_mock.add_response(
+        url=f"{api_base}/mensagens",
+        method="POST",
+        # Resposta esperada da API após o POST
+        json={
+            "id": 99, 
+            "clienteId": customer_id, 
+            "texto": "Mensagem de Marketing Gerada", 
+            "canal": "app"
+        }
+    )
+    # ----------------------------------------------------
+    
+    # A classe MockAIProvider simula a resposta da IA, mantemos essa simulação.
+    
+    # Executa a pipeline, que agora usará as respostas simuladas
+    run_pipeline(
+        input_path="dummy.csv", 
+        api_base=api_base, 
+        jwt_token="x", 
+        ai_provider=MockAIProvider(), 
+        channel="app", 
+        ids=[customer_id]
+    )
+    
+    # OPCIONAL: Adicionar asserts para verificar se todas as chamadas esperadas ocorreram.
+    # Exemplo (requer que a pipeline não lance exceções):
+    assert len(httpx_mock.get_requests()) == 2 
+
+
+
+
+
+
+
+
+
+etl/tests/test_transform.py
+
+
+TEM ESSE CONTEÚDO 
+
+
+from etl.transform import build_prompt, sanitize_output
+
+def test_build_prompt_contains_nome():
+    prompt = build_prompt({"nome": "Sergio", "segmento": "Varejo"})
+    assert "Sergio" in prompt
+
+def test_sanitize_output_limit():
+    text = "a" * 1000
+    cleaned = sanitize_output(text)
+    assert len(cleaned) == 600 
+
+
+
+
+
+
+
+
+
+
+
+etl/pyproject.toml
+
+TEM ESSE CONTEÚDO 
+
+
+[project]
+name = "genai-etl"
+version = "0.1.0"
+description = "ETL com IA generativa para mensagens de marketing"
+requires-python = ">=3.12"
+authors = [{name="Santander GenAI ETL"}]
+
+[tool.pytest.ini_options]
+testpaths = ["etl/tests"] 
+
+
+
+
+
+
+
+
+
+
+
+
+etl/requirements.txt
+
+TEM ESSE CONTEÚDO 
+
+pandas==2.1.4
+openpyxl==3.1.5
+httpx==0.27.0
+pydantic==2.9.2
+pytest==8.2.0
+requests-mock==1.12.1
+python-dotenv==1.0.1
+loguru==0.7.2 
+
+
+
+
+
+
+
+
+notebooks/SantanderDevWeek2025.ipynb
+
+
+Open In Colab
+
+
+
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Santander Dev Week 2025 - ETL com IA Generativa\n",
+    "Demonstração do pipeline ETL (Extract, Transform, Load) usando o repositório local."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "metadata": {},
+   "source": [
+    "!git clone https://github.com/Santosdevbjj/genAIpipeETLPython.git\n",
+    "import os\n",
+    "os.chdir('genAIpipeETLPython/etl')\n",
+    "!python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt\n",
+    "from etl.clients.ai_provider import MockAIProvider\n",
+    "from etl.pipeline import run_pipeline\n",
+    "run_pipeline(input_path='data/clientes.xlsx', api_base=os.getenv('API_BASE', 'http://localhost:8080/api'), jwt_token=os.getenv('JWT_TOKEN',''), ai_provider=MockAIProvider(), channel='app', ids=[1,2,3])"
+   ],
+   "execution_count": null,
+   "outputs": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "name": "python",
+   "version": "3.10"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
+     
+
+
+
+
+
+
+
+
+
+
+.github/workflows/ci-java.yml
+
+
+TEM ESSE CONTEÚDO 
+
+
+name: CI Java
+
+on:
+  push:
+    paths:
+      - 'api/**'
+      - '.github/workflows/ci-java.yml'
+  pull_request:
+    paths:
+      - 'api/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '25'
+      - name: Build and Test
+        run: |
+          cd api
+          ./gradlew clean build test 
+
+
+
+
+
+
+
+
+
+
+
+
+.github/workflows/ci-python.yml
+
+
+TEM ESSE CONTEÚDO 
+
+
+name: CI Python
+
+on:
+  push:
+    paths:
+      - 'etl/**'
+      - '.github/workflows/ci-python.yml'
+  pull_request:
+    paths:
+      - 'etl/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install deps and Project
+        run: |
+          cd etl
+          python -m venv .venv
+          . .venv/bin/activate
+          pip install -r requirements.txt
+          pip install pytest-httpx
+          # 💡 NOVO: Instala o código-fonte como um pacote editável (`-e`),
+          # que é a melhor prática para projetos com src/ para garantir que o 'etl' seja importável.
+          pip install -e . 
+
+      - name: Run tests
+        run: |
+          # Não precisamos mais do `cd etl` aqui, pois a instalação já configurou o path
+          # e o ambiente virtual foi ativado.
+          
+          # Entramos no diretório etl para ativar o ambiente.
+          cd etl
+          . .venv/bin/activate
+          
+          # 💡 NOVO: Executamos o pytest no diretório PAI (o diretório 'etl'),
+          # mas apontamos explicitamente para os testes em 'tests/'.
+          # O pytest consegue encontrar o pacote 'etl' porque ele foi instalado
+          # no passo anterior (`pip install -e .`).
+          pytest tests -q 
+
+
+
+
+
+
+
+
+
+
+
+
+.github/workflows/docs.yml
+
+TEM ESSE CONTEÚDO 
+
+
+name: Build Docs
+
+on:
+  push:
+    paths:
+      - 'docs/**'
+      - '.github/workflows/docs.yml'
+  pull_request:
+    paths:
+      - 'docs/**'
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Sphinx
+        run: |
+          pip install sphinx myst-parser sphinx-rtd-theme
+      - name: Build
+        run: |
+          sphinx-build -b html docs docs/_build/html 
+
+
+
+
+
+
+Por favor detalhe e explique todas as pastas e arquivos e suas funcionalidades.
+E também os requisitos de hardware e software.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+As regras de Meigarom Lopes e Luiz Café:
+
+
+
+ Luiz Café Tech Recruiter 
+
+
+Como escrever um README que torna seu Portfólio Legível para Recrutadores
+
+
+
+Olá, comunidade da DIO!
+
+Ao longo da minha carreira como Tech Recruiter, já avaliei centenas de repositórios no GitHub de desenvolvedores em diferentes níveis: júnior, pleno e sênior. E há algo que percebo com muita frequência ao longo desses anos, uma verdade que pode doer um pouco:
+
+Na maioria dos casos, o README decide se eu continuo analisando o repositório ou se sigo para o próximo candidato.
+E isso não acontece porque o código seja irrelevante, muito pelo contrário. Já encontrei projetos tecnicamente brilhantes que, infelizmente, passam despercebidos por muitos recrutadores que não possuem conhecimento técnico aprofundado para avaliá-los.
+
+Além disso, o tempo é escasso. São várias vagas para preencher em um curto período. É exatamente nesse cenário que o README ganha importância: ele é o primeiro sinal de que você sabe explicar o que construiu e por quê.
+
+Este artigo tem um objetivo simples: mostrar como tornar seu portfólio legível para recrutadores, sem truques, exageros ou promessas mágicas. Tudo o que compartilho aqui vem da prática real de quem avalia repositórios diariamente.
+
+Vamos lá?
+
+O erro mais comum que vejo em READMEs de portfólio
+Na maioria das vezes, o problema não é falta de código, e sim, falta de contexto.
+
+O que vejo com frequência em READMEs:
+
+Apenas dizem “Projeto feito em X tecnologia”, sem explicar o objetivo, a motivação ou as decisões envolvidas;
+READMEs claramente copiados de templates genéricos, o que demonstra falta de curiosidade e cuidado;
+Não explicam qual problema o projeto resolve.
+No dia a dia, o trabalho de um desenvolvedor é resolver problemas complexos. Se um profissional não consegue demonstrar isso no próprio repositório, ele tende a ir para o final da fila, quando não é descartado logo de início.
+
+Quando isso acontece, a sensação para quem avalia é simples:
+
+Não fica claro o que essa pessoa realmente sabe fazer;
+Parece que não há responsabilidade sobre o que foi produzido;
+Transmite desleixo e falta de profissionalismo.
+O que um recrutador quer encontrar em um repositório?
+Quando um recrutador técnico abre seu repositório, ele tenta responder rapidamente perguntas como:
+
+Que problema esse projeto resolve?
+Esse dev entende o que construiu ou apenas seguiu um tutorial?
+Ele sabe justificar suas escolhas técnicas?
+Qual o nível de complexidade do projeto?
+Como esse dev trabalha em equipe?
+Ele demonstra atualização constante?
+Aqui vale um ponto importante:
+
+Legibilidade não tem a ver com simplicidade.
+Você pode, e deve, criar projetos complexos, desde que haja intencionalidade clara. Um bom README não tenta impressionar; ele explica. E explicar bem é uma habilidade extremamente valorizada.
+
+A estrutura de README que funciona na prática
+Após analisar muitos repositórios, esta é a estrutura que mais facilita minha avaliação como recrutador. Você não precisa usar todas as seções, mas quanto mais contexto fornecer, melhor.
+
+Visão geral
+Explique em poucas linhas:
+
+O que é o projeto
+Qual problema ele resolve
+Exemplo:
+
+Aplicação web para gerenciamento de tarefas, voltada para usuários que precisam organizar demandas recorrentes de forma simples e eficiente.
+
+Objetivo do projeto
+Aqui você demonstra intencionalidade.
+
+Responda:
+
+Por que você criou esse projeto?
+Era para aprender algo específico?
+Resolver um problema real?
+Exemplo:
+
+Criei este projeto para aprofundar meus conhecimentos em autenticação JWT e na organização de uma API REST escalável.
+
+Decisões técnicas
+Essa é uma das seções mais importantes, e também uma das mais ignoradas.
+
+Explique:
+
+Por que escolheu essa stack;
+Quais alternativas considerou;
+Quais trade-offs aceitou.
+Exemplo:
+
+Optei por Node.js com Express pela simplicidade e maturidade do ecossistema. Avaliei utilizar NestJS, mas para o escopo do projeto preferi uma abordagem mais direta e com menor curva de aprendizado.
+Isso demonstra pensamento crítico, algo extremamente valorizado em processos seletivos.
+
+Tecnologias utilizadas
+Seja objetivo e evite listas infladas sem propósito.
+
+Exemplo:
+
+Node.js
+Express
+PostgreSQL
+JWT para autenticação
+Docker para ambiente de desenvolvimento
+
+Como executar o projeto
+Simples, mas faz muita diferença.
+
+Inclua:
+
+Pré-requisitos;
+Passos claros para rodar o projeto localmente.
+Isso demonstra cuidado, organização e respeito por quem está avaliando.
+
+Aprendizados
+Essa seção costuma ser decisiva.
+
+Aqui você pode responder:
+
+O que foi mais difícil e como pretende superar essas adversidades?
+Quais foram seus principais aprendizados?
+O que faria diferente hoje?
+Quem te ajudou ou inspirou durante o desenvolvimento?
+Exemplo:
+
+Aprendi a importância de separar regras de negócio da camada de controllers, o que facilitou a escrita de testes e a manutenção do código.
+
+Próximos passos
+Mostrar que o projeto não está “fechado” é um ponto positivo.
+
+Exemplo:
+
+Melhorar a cobertura de testes
+Implementar cache
+Refatorar parte da arquitetura
+Isso demonstra visão de evolução e maturidade técnica.
+
+
+O README como narrativa técnica
+O README não é apenas documentação. Ele é a sua narrativa técnica.
+
+Para nós, recrutadores, o README funciona melhor quando conta uma história clara:
+
+Qual era o problema;
+Quais decisões você tomou;
+Quais foram seus aprendizados, erros e acertos;
+Como foi sua jornada de desenvolvimento.
+Mesmo um projeto simples pode se tornar relevante quando bem explicado. É por isso que alguns candidatos conseguem oportunidades mesmo com poucos projetos, porque sabem comunicar bem seu raciocínio.
+
+Para quem esse modelo de README funciona melhor?
+Com base na minha experiência, esse modelo é especialmente útil para:
+
+Desenvolvedores júnior e pleno;
+Pessoas em transição de carreira;
+Profissionais sênior que contribuem com projetos open source.
+O segredo é facilitar a vida de quem avalia. Se o recrutador entende rapidamente seu raciocínio, suas chances de avançar aumentam.
+
+Considerações finais
+Espero sinceramente que, após este artigo, você tenha entendido a importância de dedicar tempo à escrita de um bom README. Ele não garante uma vaga, mas evita que você seja eliminado logo de cara. Minha dica final é: invista tempo, revise, peça para amigos e colegas lerem o que você escreveu. Feedback externo ajuda a identificar falhas e melhorar a clareza.
+
+Inspire-se em outros READMEs, mas evite copiar e colar. Seja autoral. É assim que você se destaca.
+
+Bons estudos e projetos!
+
+
+
+
+Let´s code! 
+
+
+
+
+
+
+
+
+Código de conduta
+
+Luiz Café - 16/12/2025 11:50
+Olá, Alex! Obrigado pelo seu comentário. A área de dados está com muitas oportunidades abertas, capriche nos seus projetos e no Readme que as portas irão se abrir. Não deixe também de participar das competições no Kaggle para ganhar destaque e experiência. Muito sucesso!
+
+
+
+Brasil
+Luiz Café - 16/12/2025 11:48
+Olá, Nubia. Muito obrigado pelo seu feedback, ele é muito importante para que eu continue escrevendo artigos como esse. Desejo muito sucesso na sua carreira.
+
+
+
+Brasil
+Alex Almeida - 16/12/2025 09:25
+Muito Bacana.
+
+Já venho melhorando os meu reddits em busca de uma oportunidade na área de dados
+
+
+
+Brasil
+Nubia Alves - 15/12/2025 22:16
+Olá, Luiz,
+
+Que riqueza de material que você se dispôs a compartilhar!
+
+Já estou salvando esse material no meu notebookLM porque ele merece ser lido mais de uma vez e ser seguido como roteiro para o meu próximo README de projetos.
+
+
+
+Brasil
+Luiz Café - 15/12/2025 21:06
+Muito obrigado Manuel. Seu comentário me motiva a continuar compartilhando conteúdos como esse para toda comunidade. Fico feliz em ajudar.
+
+
+
+MN
+Manuel Nvula - 15/12/2025 17:45
+Muito bom e útil o artigo, Luiz Café. Obrigado por compartilhar.
+
+Aprendi bastante com ele.
+
+
+
+
+
+REGRAS DE MEIGAROM DA CDS PARA DOCUMENTAÇÃO DE PROJETOS COMO CIENTISTA DE DADOS PROFISSIONAL 
+
+
+
+
+MEIGAROM DA CDS
+
+
+
+
+Análise de Atrasos de Entregas da Amazon
+
+1. Problema de Negócio
+
+A empresa enfrenta um aumento no número de entregas realizadas fora do prazo, o que tem
+gerado insatisfação dos clientes, aumento de reclamações e risco de perda de confiança na
+marca.
+O principal desafio do negócio é entender por que os atrasos acontecem, identificar onde
+eles se concentram e gerar informações claras que apoiem decisões operacionais para
+reduzir a taxa de atraso e melhorar a previsibilidade das entregas.
+
+2. Contexto
+
+A operação de entregas envolve diferentes variáveis que impactam diretamente o prazo, como:
+● condições climáticas,
+● tráfego,
+● tipo de veículo utilizado,
+● área de entrega,
+● perfil do entregador,
+● categoria do produto.
+A empresa já possui os dados operacionais registrados em uma base histórica, mas não utiliza
+essas informações de forma analítica para apoiar decisões estratégicas.
+O objetivo deste projeto é transformar dados brutos de entregas em insights acionáveis,
+utilizando análises descritivas e visualizações simples, capazes de serem compreendidas por
+áreas como Operações, Logística e Gestão.
+
+
+3. Premissas da análise
+
+Para a realização da análise, foram adotadas as seguintes premissas:
+
+
+
+● O status de entrega (Delivery_Status) é considerado a fonte oficial para identificar
+atrasos (delay) e entregas no prazo (ontime).
+● O tempo de entrega (Delivery_Time) está representado em minutos.
+● Registros com valores ausentes em colunas como tráfego ou clima foram tratados como
+“informação desconhecida” ou excluídos quando necessário.
+● As análises foram feitas com foco em identificação de padrões, não em causalidade
+estatística.
+● O período analisado representa uma amostra válida do comportamento operacional
+recente da empresa.
+
+4. Estratégia da solução
+
+A estratégia adotada seguiu uma abordagem estruturada de análise de dados:
+
+1. Entendimento do problema de negócio
+Identificar claramente o que significa atraso e por que ele é prejudicial para a empresa.
+
+2. Exploração e organização dos dados
+Compreensão das colunas, tipos de dados e possíveis inconsistências.
+
+3. Análise descritiva
+Cálculo de métricas como quantidade de entregas, taxa de atraso e estatísticas de
+tempo de entrega.
+
+4. Segmentação dos atrasos
+Avaliação dos atrasos por diferentes dimensões:
+○ tempo,
+○ área,
+○ clima,
+○ tráfego,
+○ veículo,
+○ categoria de produtos
+
+5. Visualização dos dados
+Criação de gráficos claros para facilitar a interpretação dos resultados e comunicação
+com o negócio.
+
+
+5. Insights da Análise
+
+A análise dos dados permitiu identificar padrões relevantes, como:
+● O tempo médio de entrega é de 125 min (2h) com desvio-padrão de 52 min (2h). A
+entrega mais rápida aconteceu em 10 min e a mais lenta em 270 min (4,5h).
+
+
+
+A área “Semi-Urban” é a única área que apresenta mais atrasos do que entregas sem
+atraso.
+● Os atrasos aumentam em dias nublados e com neblina, e diminuem em dias de sol.
+● Veículos como motocicletas apresentam maior taxa de entrega atrasada em relação aos
+outros meios de transporte.
+● O nível de tráfego forte ( Jam ), apresenta mais atrasos.
+● Os maiores atrasos aconteceram com entregas para a área “Semi-Urban” realizadas por
+motocicletas como veículo.
+● Entregadores com idade acima dos 30 anos tendem a atrasar mais as entregas do que
+entregadores abaixo dos 30.
+● As entregas estão distribuídas uniformemente entre as categorias, exceto a categoria
+outros que representa 43% das entregas.
+● A menor avaliação acontece com entregas na área “Semi-Urbam” com o veículo
+motocicleta que também apresenta maior volume de atrasos.
+Esses insights mostram que o atraso não é aleatório, mas resultado de fatores operacionais
+como área e tipo de veículos para entrega.
+
+
+6. Resultados
+
+
+Como resultado do projeto, as iniciativas são:
+● Aprofundar o entendimento do motivo pelo qual a área “Semi-Urban” tem os maiores
+volumes de atraso.
+● Mudar o tipo de veículo de entrega para a área “Semi-Urban”
+● Diagnóstico visual dos pontos mais críticos da operação.
+● Base analítica para priorizar ações corretivas.
+● Relatórios e gráficos que podem ser utilizados por áreas não técnicas.
+Além disso, o projeto demonstra como a análise de dados pode transformar dados
+operacionais em decisões práticas, mesmo utilizando técnicas simples.
+
+
+7. Próximos passos
+
+
+Com base nos resultados obtidos, os próximos passos recomendados são:
+● Criar planos de ação específicos para áreas, veículos e condições mais críticas.
+● Monitorar a taxa de atraso de forma contínua por meio de dashboards.
+● Avaliar treinamentos ou ajustes operacionais para entregadores e rotas.
+● Integrar análises preditivas para antecipar riscos de atraso.
+
+
+Aprofundar a análise com dados adicionais, como distância percorrida ou horário de
+pico.
+Este projeto serve como primeiro passo para uma cultura orientada a dados, onde decisões
+operacionais passam a ser guiadas por evidências e não apenas por percepção. 
+
+
+
+
+Estrutura de um Projeto de Dados de Sucesso:
+
+​O MEIGAROM destaca que um projeto não deve ser apenas um "gráfico bonito", mas deve seguir 7 passos:
+
+​1- Problema de Negócio: O que motivou a análise?
+
+​2- Contexto: O cenário da empresa.
+
+​3- Premissas: O que foi considerado verdade nos dados.
+
+​4- Estratégia da Solução: O passo a passo técnico.
+
+​5- Insights: A interpretação dos dados (o que os gráficos dizem).
+
+​6- Resultados: Conclusão e recomendação para a empresa.
+
+​7- Próximos Passos: O que seria feito com mais tempo.
+
+
+
+
+
+Implementação dos 11 Passos Profissionais (Framework CDS) DE MEIGAROM LOPES 
+
+​Para o seu README refletir esse novo nível, você deve reorganizar as seções seguindo fielmente a metodologia do vídeo:
+
+​Problema de Negócio: (Você já tem - Redução de multas na MRV).
+​Baseline: Novo! Como a MRV prevê atrasos hoje? (Ex: "Hoje a empresa usa apenas a média histórica de 10 dias"). O seu modelo precisa bater essa média.
+​Planejamento da Solução: Liste as ferramentas (Python, Scikit-Learn, Telegram API, Render Cloud).
+​Limpeza de Dados: Detalhe como tratou inconsistências de clima e solo.
+​EDA (Exploratória): Foque em validar hipóteses (Ex: "Obras em solo arenoso atrasam 20% mais?").
+​Preparação de Dados: Explique o One-Hot Encoding e Scaler.
+​Treinamento: Justifique a escolha do algoritmo (Random Forest).
+​Performance: Apresente o MAE e RMSE.
+​Business Performance: O Pulo do Gato! Converta o erro do modelo em Reais (R$). "Cada dia de atraso custa R$ X. Com erro de 5 dias, o risco financeiro residual é de R$ Y."
+​Modelo em Produção: Explique como a API Flask/FastAPI serve o modelo.
+​Storytelling: A apresentação final (O Bot do Telegram).
+
+
+
+  Pontos importantes: 
+
+Para virar um resolvedor de problemas, 
+você tem que mostrar que resolve problemas com a ferramenta, e não que apenas usa a ferramenta. 
+
+Você tem que se posicionar como um resolvedor de problemas.
+
+O mercado de trabalho não contrata ferramenta, o mercado de trabalho contrata quem resolve problemas.
+
+
+
+
+
+
+
+
+
+
+
+
+
